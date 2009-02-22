@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<int80h:Window xmlns:int80h="biz.int80h.*" xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" width="554" height="130">
+	<mx:String id="question"></mx:String>
+	
+	<mx:Metadata>
+		[Event(name="Confirmed", type="flash.events.Event")] 
+	</mx:Metadata>
+	
+	<mx:Script>
+		<![CDATA[
+			private function confirm():void {
+				this.dispatchEvent(new Event("Confirmed"));
+				this.postClose();
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:Label x="10" y="10" text="{question}" width="514" height="39"/>
+	<mx:Button x="481" y="58" label="OK" click="this.confirm()"/>
+	<mx:Button x="410" y="58" label="Cancel" click="this.postClose()"/>
+	
+</int80h:Window>
