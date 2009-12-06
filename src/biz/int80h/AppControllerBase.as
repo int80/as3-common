@@ -4,21 +4,36 @@ package biz.int80h
 	import flash.net.URLVariables;
 	
 	import mx.collections.ArrayCollection;
+	import mx.core.Application;
 	import mx.core.ClassFactory;
+	import biz.int80h.IAppController;
 	
-	[Bindable] public class AppControllerBase extends EventDispatcher
+	[Bindable] public class AppControllerBase extends EventDispatcher implements IAppController
 	{
 		private var entities:Object = {};
+		private var lastEntities:Object = {};
 		
+		static public var appController:IAppController;
+		
+		public function get defaultApiUrl():String {
+			return null;
+		}
 		
 		public function AppControllerBase()
 		{
 		}
 		
-		public static function getApiUrl(path:String, args:URLVariables=null):String {
-			if (! args) args = new URLVariables();
+		public function getApiUrl(path:String, args:URLVariables=null):String {
+			var urlRoot:String = Application.application.parameters.base_url;
 			
-			var url:String = "http://localhost:3003/api/" + path;
+			if (! urlRoot) {
+				urlRoot = this.defaultApiUrl;
+				if (! urlRoot)
+					urlRoot = "http://localhost:3002";
+			}
+			
+			var url:String = urlRoot + "/api/" + path;
+			
 			if (! args || ! args.toString())
 				return url;
 				
@@ -28,19 +43,22 @@ package biz.int80h
 		public function getEntitySingleton(entityClass:Class):Entity {
 			var entFactory:ClassFactory = new ClassFactory(entityClass);
 			var ent:Entity = entFactory.newInstance();
-			var self:Object = this;
-			ent.addEventListener("EntitiesUpdated", function ():void { self.dispatchEvent(new Event("EntityListUpdated")) });
+			ent.addEventListener("EntitiesUpdated", function ():void { entityListUpdated(ent) });
 			return ent;
 		}
+
+		// todo: figure out a way to see if the list changed and not dispatch event unless it's different		
+		private function entityListUpdated(ent:Entity):void {
+			this.dispatchEvent(new Event("EntityListUpdated"));
+		}
 		
-		// fixme: have binding update only when this class entityList changes
-		public function loadAllEntities(entityClass:Class):void {
+		public function loadAllEntities(entityClass:Class, opts:Object=null):void {
 			var ent:Entity = entities[entityClass];
 			if (! ent) {
 				ent = this.getEntitySingleton(entityClass);
 			}
 			
-			ent.loadAll();
+			ent.loadAll(opts);
 		}
 		
 		[Bindable(event="EntityListUpdated")]

@@ -1,14 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties version="1">
-<includeClasses>
-<classEntry path="biz.int80h.ConfirmDialog"/>
-<classEntry path="biz.int80h.Entity"/>
-<classEntry path="biz.int80h.WindowManager"/>
-<classEntry path="biz.int80h.VideoPlayer"/>
-<classEntry path="biz.int80h.Window"/>
-<classEntry path="biz.int80h.EntitiesLoadedEvent"/>
-<classEntry path="biz.int80h.AppControllerBase"/>
-</includeClasses>
-<includeResources/>
-<namespaceManifests/>
+  <includeClasses>
+    <classEntry path="biz.int80h.Window"/>
+    <classEntry path="biz.int80h.AppControllerBase"/>
+    <classEntry path="biz.int80h.RESTService"/>
+    <classEntry path="biz.int80h.VideoPlayer"/>
+    <classEntry path="biz.int80h.WindowManager"/>
+    <classEntry path="biz.int80h.EntitiesLoadedEvent"/>
+    <classEntry path="biz.int80h.Entity"/>
+    <classEntry path="biz.int80h.ConfirmDialog"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
 </flexLibProperties>

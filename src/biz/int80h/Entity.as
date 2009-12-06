@@ -7,7 +7,6 @@ package biz.int80h
 	import mx.core.ClassFactory;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.http.HTTPService;
-	import mx.utils.ObjectProxy;
 	
 	[Bindable] dynamic public class Entity extends EventDispatcher
 	{
@@ -112,9 +111,9 @@ package biz.int80h
 			);
 		}
 		
-		[Bindable(event="EntitiesUpdated")] public function loadAll():void {
+		[Bindable(event="EntitiesUpdated")] public function loadAll(search:Object=null):void {
 			var self:Entity = this;
-			doRequest("", function (evt:ResultEvent):void { self.loadEntitiesComplete(evt) }, "GET");
+			doRequest("", function (evt:ResultEvent):void { self.loadEntitiesComplete(evt) }, "GET", search);
 		}
 		
 		public function update(fields:Object):void {
@@ -129,6 +128,8 @@ package biz.int80h
 			this.setFields(res.result.opt.data.list);
 		}
 		
+		//public static function instantiateLoadedEntities(resultSource:Object, classCtor:Object) {
+		
 		protected function loadEntitiesComplete(res:ResultEvent):void {
 			var entityList:ArrayCollection = _entities[this.className];
 			if (! entityList)
@@ -138,8 +139,8 @@ package biz.int80h
 			
 			var list:ArrayCollection = res.result.opt.data.list as ArrayCollection;
 			if (! list) list = new ArrayCollection([ res.result.opt.data.list ]);
-				
-			for each (var entityFields:ObjectProxy in list) {
+
+			for each (var entityFields:Object in list) {
 				var entityInstance:Object = new this.constructor;
 				entityInstance.setFields(entityFields);
 				
@@ -163,19 +164,19 @@ package biz.int80h
 				vars[f] = params[f];
 			}
 			
-			if (! vars['content-type'])
-				vars['content-type'] = 'text/xml';
+			//if (! vars['content-type'])
+			///	vars['content-type'] = 'text/xml';
 			
 			vars['x-tunneled-method'] = method;
 						
 			var req:HTTPService = new HTTPService();
 			req.method = method == "GET" ? "GET" : "POST";
-			req.url = AppControllerBase.getApiUrl("rest/" + this.className + url);
+			req.url = AppControllerBase.appController.getApiUrl("rest/" + this.className + url);
 			req.addEventListener(ResultEvent.RESULT, cb);
 			
-			req.headers = { // I wish this worked with GETs
+			/*req.headers = { // I wish this worked with GETs
 				'Accept': 'application/xml'
-			}; 
+			}; */
 
 			req.send(vars);
 		}
