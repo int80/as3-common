@@ -15,7 +15,7 @@ package biz.int80h
 		
 		static public var appController:IAppController;
 		
-		public function get defaultApiUrl():String {
+		public function defaultApiUrl():String {
 			return null;
 		}
 		
@@ -27,7 +27,7 @@ package biz.int80h
 			var urlRoot:String = Application.application.parameters.base_url;
 			
 			if (! urlRoot) {
-				urlRoot = this.defaultApiUrl;
+				urlRoot = this.defaultApiUrl();
 				if (! urlRoot)
 					urlRoot = "http://localhost:3002";
 			}
