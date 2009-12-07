@@ -2,21 +2,23 @@ package biz.int80h
 {
 	import flash.events.EventDispatcher;
 	import flash.net.URLVariables;
+	import flash.utils.describeType;
+	import flash.utils.getDefinitionByName;
+	import flash.utils.getQualifiedClassName;
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.http.HTTPService;
+	import mx.utils.ObjectProxy;
 	
 	[Bindable] dynamic public class Entity extends EventDispatcher
 	{
 		private static var _entities:Object = {};
-		private var fields:Object;
 		
 		public function Entity(fields:Object=null)
 		{
-			if (! fields) fields = {};
-			this.fields = fields;
+			this.setFields(fields);
 		}
 		
 		
@@ -28,44 +30,55 @@ package biz.int80h
 		//// fields
 		
 		[Bindable(event="FieldsChanged")] public function field(fieldName:String):* {
-			if (! this.fields.hasOwnProperty(fieldName))
+			if (! this.hasOwnProperty(fieldName))
 				return undefined;
 			 
-			return this.fields[fieldName];
+			return this[fieldName];
 		}
 		
-		public function setField(fieldName:String, value:Object):void {
-			this.fields[fieldName] = value;
-			this[fieldName] = value;
-			this.fieldsChanged();
+		public function setField(fieldName:String, value:Object, fireFieldsChangedEvent:Boolean=true):void {
+			if (value is ObjectProxy) {
+				var type:String = getQualifiedClassName(this[fieldName]);
+				var typeInfo:Object = describeType(this);
+				
+				// try normal property
+				var typeName:String = typeInfo..variable.(@name == fieldName).@type;
+				
+				if (! typeName) {
+					// try bindable accessor method
+					typeName = typeInfo..accessor.(@name == fieldName).@type;
+				}
+				
+				if (! typeName) {
+					// failed to find it
+					trace("failed to find type info for " + type + "." + fieldName);
+					return;
+				}
+				
+				var typeClass:Class = getDefinitionByName(typeName) as Class;
+				
+				this[fieldName] = new typeClass(value);
+			} else {
+				this[fieldName] = value;
+			}
+		
+			if (fireFieldsChangedEvent)
+				this.fieldsChanged();
 		}
 		
 		public function setFields(fields:Object):void {
 			if (! fields) fields = {};
-			this.fields = fields;
-			
-			for (var field:String in fields) {
-				this[field] = fields[field];
+
+			for (var field:* in fields) {
+				this.setField(field, fields[field], false);
 			}
 			
-			//this.fieldsChanged();
+			this.fieldsChanged();
 		}
 		
 		protected function fieldsChanged():void {
 			this.dispatchEvent(new Event("FieldsChanged"));
 		}
-
-
-		// identifier
-		
-		public function get id():Number {
-			return this.field("id");
-		}
-		
-		public function set id(id:Number):void {
-			this.setField("id", id);
-		}
-		
 		
 		// CRUD
 		

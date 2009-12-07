@@ -6,7 +6,6 @@ package biz.int80h
 	import mx.collections.ArrayCollection;
 	import mx.core.Application;
 	import mx.core.ClassFactory;
-	import biz.int80h.IAppController;
 	
 	[Bindable] public class AppControllerBase extends EventDispatcher implements IAppController
 	{
@@ -49,7 +48,8 @@ package biz.int80h
 
 		// todo: figure out a way to see if the list changed and not dispatch event unless it's different		
 		private function entityListUpdated(ent:Entity):void {
-			this.dispatchEvent(new Event("EntityListUpdated"));
+			trace("firing updated event");
+			dispatchEvent(new Event("EntityListUpdated"));
 		}
 		
 		public function loadAllEntities(entityClass:Class, opts:Object=null):void {
@@ -59,6 +59,21 @@ package biz.int80h
 			}
 			
 			ent.loadAll(opts);
+		}
+		
+		[Bindable(event="EntityListUpdated")]
+		public function getAllEntitiesFiltered(entityClass:Class, filterField:String, filterValue:Object=null):ArrayCollection {
+			var ent:Entity = this.getEntitySingleton(entityClass);
+			var all:Array = ent.all ? ent.all.toArray() : [];
+			
+			var allCollection:ArrayCollection = new ArrayCollection(all);
+			
+			allCollection.filterFunction = function (item:Object):Boolean {
+				return item[filterField] == filterValue;
+			};
+			allCollection.refresh();
+
+			return allCollection;
 		}
 		
 		[Bindable(event="EntityListUpdated")]
