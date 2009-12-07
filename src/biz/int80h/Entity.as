@@ -169,16 +169,13 @@ package biz.int80h
 		
 		
 		// utility
-		
+		// this has been deprecated in favor of RESTService
 		protected function doRequest(url:String="", cb:Function=null, method:String="POST", params:Object=null):void {
 			var vars:URLVariables = new URLVariables();
 			for (var f:String in params) {
 				if (! params.hasOwnProperty(f)) continue;
 				vars[f] = params[f];
 			}
-			
-			//if (! vars['content-type'])
-			///	vars['content-type'] = 'text/xml';
 			
 			vars['x-tunneled-method'] = method;
 						
@@ -187,10 +184,6 @@ package biz.int80h
 			req.url = AppControllerBase.appController.getApiUrl("rest/" + this.className + url);
 			req.addEventListener(ResultEvent.RESULT, cb);
 			
-			/*req.headers = { // I wish this worked with GETs
-				'Accept': 'application/xml'
-			}; */
-
 			req.send(vars);
 		}
 	}
