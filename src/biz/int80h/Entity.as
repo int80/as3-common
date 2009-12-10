@@ -139,27 +139,15 @@ package biz.int80h
 		
 		protected function loadComplete(res:ResultEvent):void {
 			this.setFields(res.result.opt.data.list);
+			this.dispatchEvent(new Event("EntityLoaded"))
 		}
-		
-		//public static function instantiateLoadedEntities(resultSource:Object, classCtor:Object) {
-		
+				
 		protected function loadEntitiesComplete(res:ResultEvent):void {
 			var entityList:ArrayCollection = _entities[this.className];
 			if (! entityList)
 				entityList = _entities[this.className] = new ArrayCollection();
-			else
-				entityList.removeAll();
-			
-			var list:ArrayCollection = res.result.opt.data.list as ArrayCollection;
-			if (! list) list = new ArrayCollection([ res.result.opt.data.list ]);
-
-			for each (var entityFields:Object in list) {
-				var entityInstance:Object = new this.constructor;
-				entityInstance.setFields(entityFields);
 				
-				entityList.addItem(entityInstance);
-			}
-			
+			Entity.instantiateList(res.result.opt.data.list, this.constructor, entityList);
 			this.dispatchEvent(new Event("EntitiesUpdated"));
 		}
 		
@@ -168,7 +156,23 @@ package biz.int80h
 		}
 		
 		
-		// utility
+		//// utility
+		
+		static public function instantiateList(listObj:Object, ctor:Object, newList:ArrayCollection):void {
+			// force into arraycollection, even if it is a single object
+			var list:ArrayCollection = listObj as ArrayCollection;
+			if (! list) list = new ArrayCollection([ listObj ]);
+
+			newList.removeAll();
+
+			for each (var entityFields:Object in list) {
+				var entityInstance:Object = new ctor;
+				entityInstance.setFields(entityFields);
+				
+				newList.addItem(entityInstance);
+			}
+		}
+		
 		// this has been deprecated in favor of RESTService
 		protected function doRequest(url:String="", cb:Function=null, method:String="POST", params:Object=null):void {
 			var vars:URLVariables = new URLVariables();
