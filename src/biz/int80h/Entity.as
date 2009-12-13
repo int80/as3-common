@@ -9,7 +9,6 @@ package biz.int80h
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
 	import mx.rpc.events.ResultEvent;
-	import mx.rpc.http.HTTPService;
 	import mx.utils.ObjectProxy;
 	
 	[Bindable] dynamic public class Entity extends EventDispatcher
@@ -96,7 +95,7 @@ package biz.int80h
 		public function deleteEntity():void {
 			this.doRequest("/" + this.id + "", function (evt:ResultEvent):void {
 				
-			}, "DELETE");
+			}, "DELETE", this.primaryKey());
 		}
 				
 		[Bindable(event="EntitiesUpdated")] public function get all():ArrayCollection {
@@ -110,6 +109,7 @@ package biz.int80h
 		
 		public function load(cb:Function=null):void {			
 			var self:Entity = this;
+						
 			doRequest(
 				"", 
 				function (evt:ResultEvent):void {
@@ -118,10 +118,13 @@ package biz.int80h
 					self.loadComplete(evt);
 				},
 				"GET",
-				{
-					'search.id': this.id
-				}
+				self.primaryKey()
 			);
+		}
+		
+		// override if PK is not "id"
+		public function primaryKey():Object {
+			return { "search.id": this.id };
 		}
 		
 		[Bindable(event="EntitiesUpdated")] public function loadAll(search:Object=null):void {
@@ -161,16 +164,29 @@ package biz.int80h
 		static public function instantiateList(listObj:Object, ctor:Object, newList:ArrayCollection):void {
 			// force into arraycollection, even if it is a single object
 			var list:ArrayCollection = listObj as ArrayCollection;
-			if (! list) list = new ArrayCollection([ listObj ]);
+			if (! list && listObj) list = new ArrayCollection([ listObj ]);
 
 			newList.removeAll();
+			
+			if (! list || ! listObj)
+				return;
 
 			for each (var entityFields:Object in list) {
-				var entityInstance:Object = new ctor;
-				entityInstance.setFields(entityFields);
+				var entityInstance:Entity = Entity.instantiateRow(entityFields, ctor);
+				
+				if (! entityInstance) {
+					trace("Error instantiating " + ctor);
+					continue;
+				}
 				
 				newList.addItem(entityInstance);
 			}
+		}
+		
+		static public function instantiateRow(rowObj:Object, ctor:Object):Entity {
+			var entityInstance:Object = new ctor;
+			entityInstance.setFields(rowObj);
+			return entityInstance as Entity;
 		}
 		
 		// this has been deprecated in favor of RESTService
@@ -181,11 +197,9 @@ package biz.int80h
 				vars[f] = params[f];
 			}
 			
-			vars['x-tunneled-method'] = method;
-						
-			var req:HTTPService = new HTTPService();
-			req.method = method == "GET" ? "GET" : "POST";
-			req.url = AppControllerBase.appController.getApiUrl("rest/" + this.className + url);
+			var req:RESTService = new RESTService();
+			req.method = method;
+			req.apiUrl = "rest/" + this.className + url;
 			req.addEventListener(ResultEvent.RESULT, cb);
 			
 			req.send(vars);

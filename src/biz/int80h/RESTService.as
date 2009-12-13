@@ -13,8 +13,16 @@ package biz.int80h
 		}
 		
 		override public function send(parameters:Object=null):AsyncToken {
-			if (this.method)
-				this.headers["x-tunneled-method"] = this.method;
+			if (! parameters)
+				parameters = {};
+			
+			//this.headers["x-tunneled-method"] = this.method;
+			if (this.method && this.method.toUpperCase() != "GET") {
+				parameters["x-tunneled-method"] = this.method;
+				this.method = "POST";
+			} else {
+				this.method = "GET";
+			}
 			
 			return super.send(parameters);
 		}

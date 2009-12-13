@@ -48,7 +48,6 @@ package biz.int80h
 
 		// todo: figure out a way to see if the list changed and not dispatch event unless it's different		
 		private function entityListUpdated(ent:Entity):void {
-			trace("firing updated event");
 			dispatchEvent(new Event("EntityListUpdated"));
 		}
 		
