@@ -19,7 +19,7 @@ package biz.int80h
 			//this.headers["x-tunneled-method"] = this.method;
 			if (this.method && this.method.toUpperCase() != "GET") {
 				parameters["x-tunneled-method"] = this.method;
-				this.method = "POST";
+				this.method = "POST"; // must be POST for Catalyst::Request::REST::ForBrowsers
 			} else {
 				this.method = "GET";
 			}

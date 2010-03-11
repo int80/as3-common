@@ -58,6 +58,8 @@ package biz.int80h
 				
 				this[fieldName] = new typeClass(value);
 			} else {
+				if (value == "")
+					value = null;
 				this[fieldName] = value;
 			}
 		
@@ -99,6 +101,10 @@ package biz.int80h
 		}
 				
 		[Bindable(event="EntitiesUpdated")] public function get all():ArrayCollection {
+			if (! Entity._entities[this.className]) {
+				Entity._entities[this.className] = new ArrayCollection();
+			}
+			
 			return Entity._entities[this.className];
 		}
 		
@@ -134,6 +140,14 @@ package biz.int80h
 		
 		public function update(fields:Object):void {
 			var self:Entity = this;
+			
+			var pk:Object = this.primaryKey();
+			for (var key:String in pk) {
+				if (fields[key] || key == 'search.id') continue;
+				
+				fields[String(key)] = pk[key];
+			}
+			
 			doRequest("/" + this.id, function (evt:ResultEvent):void { self.updateComplete(evt) }, "PUT", fields);
 		}
 		
@@ -150,12 +164,20 @@ package biz.int80h
 			if (! entityList)
 				entityList = _entities[this.className] = new ArrayCollection();
 				
-			Entity.instantiateList(res.result.opt.data.list, this.constructor, entityList);
+			if (! res || ! res.result || ! res.result.opt || ! res.result.opt.data)
+				return;
+				
+			if (res.result.opt.data.list)
+				Entity.instantiateList(res.result.opt.data.list, this.constructor, entityList);
+			else
+				entityList.removeAll();
+				
 			this.dispatchEvent(new Event("EntitiesUpdated"));
 		}
 		
 		protected function updateComplete(evt:ResultEvent):void {
 			this.load();
+			this.dispatchEvent(new Event("EntityUpdated"));
 		}
 		
 		

@@ -68,6 +68,10 @@ package biz.int80h
 			var allCollection:ArrayCollection = new ArrayCollection(all);
 			
 			allCollection.filterFunction = function (item:Object):Boolean {
+				if (! filterValue) {
+					return ! item[filterField];
+				}
+				
 				return item[filterField] == filterValue;
 			};
 			allCollection.refresh();
