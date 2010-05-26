@@ -58,9 +58,15 @@ package biz.int80h
 				
 				this[fieldName] = new typeClass(value);
 			} else {
-				if (value == "")
-					value = null;
-				this[fieldName] = value;
+				if (this.hasOwnProperty(fieldName)) {
+					if (value == "")
+						value = null;
+						
+					this[fieldName] = value;
+				} else {
+					trace("ERROR: property " + fieldName + " does not exist on "
+						+ getQualifiedClassName(this));
+				}
 			}
 		
 			if (fireFieldsChangedEvent)
