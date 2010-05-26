@@ -94,9 +94,10 @@ package biz.int80h
 			}, "PUT", fields);
 		}
 		
-		public function deleteEntity():void {
+		public function deleteEntity(callback:Function=null):void {
 			this.doRequest("/" + this.id + "", function (evt:ResultEvent):void {
-				
+				if (callback != null)
+					callback(this);
 			}, "DELETE", this.primaryKey());
 		}
 				
@@ -148,7 +149,7 @@ package biz.int80h
 				fields[String(key)] = pk[key];
 			}
 			
-			doRequest("/" + this.id, function (evt:ResultEvent):void { self.updateComplete(evt) }, "PUT", fields);
+			doRequest("/" + this.id, function (evt:ResultEvent):void { self.updateComplete(evt) }, "POST", fields);
 		}
 		
 		
@@ -173,6 +174,7 @@ package biz.int80h
 				entityList.removeAll();
 				
 			this.dispatchEvent(new Event("EntitiesUpdated"));
+			entityList.dispatchEvent(new Event("EntitiesLoaded"));
 		}
 		
 		protected function updateComplete(evt:ResultEvent):void {
