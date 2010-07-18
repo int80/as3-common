@@ -51,13 +51,13 @@ package biz.int80h
 			dispatchEvent(new Event("EntityListUpdated"));
 		}
 		
-		public function loadAllEntities(entityClass:Class, opts:Object=null):void {
+		public function loadAllEntities(entityClass:Class, opts:Object=null, cb:Function=null):void {
 			var ent:Entity = entities[entityClass];
 			if (! ent) {
 				ent = this.getEntitySingleton(entityClass);
 			}
 			
-			ent.loadAll(opts);
+			ent.loadAll(opts, cb);
 		}
 		
 		[Bindable(event="EntityListUpdated")]

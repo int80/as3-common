@@ -8,6 +8,7 @@ package biz.int80h
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.ClassFactory;
+	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.utils.ObjectProxy;
 	
@@ -101,9 +102,10 @@ package biz.int80h
 		}
 		
 		public function deleteEntity(callback:Function=null):void {
+			var self:Entity = this;
 			this.doRequest("/" + this.id + "", function (evt:ResultEvent):void {
 				if (callback != null)
-					callback(this);
+					callback(self);
 			}, "DELETE", this.primaryKey());
 		}
 				
@@ -140,9 +142,12 @@ package biz.int80h
 			return { "search.id": this.id };
 		}
 		
-		[Bindable(event="EntitiesUpdated")] public function loadAll(search:Object=null):void {
+		[Bindable(event="EntitiesUpdated")] public function loadAll(search:Object=null, cb:Function=null):void {
 			var self:Entity = this;
-			doRequest("", function (evt:ResultEvent):void { self.loadEntitiesComplete(evt) }, "GET", search);
+			doRequest("", function (evt:ResultEvent):void {
+				self.loadEntitiesComplete(evt);
+				if (cb != null) { cb(); }
+			}, "GET", search);
 		}
 		
 		public function update(fields:Object):void {
@@ -219,6 +224,12 @@ package biz.int80h
 			return entityInstance as Entity;
 		}
 		
+		private function gotFault(evt:FaultEvent, url:String):void {
+			trace("Got error for URL " + url + ": " + evt.fault.faultDetail);
+			trace("[Stack trace]\n" + evt.fault.getStackTrace());
+			this.dispatchEvent(evt);
+		}
+		
 		// this has been deprecated in favor of RESTService
 		protected function doRequest(url:String="", cb:Function=null, method:String="POST", params:Object=null):void {
 			var vars:URLVariables = new URLVariables();
@@ -231,6 +242,9 @@ package biz.int80h
 			req.method = method;
 			req.apiUrl = "rest/" + this.className + url;
 			req.addEventListener(ResultEvent.RESULT, cb);
+			req.addEventListener(FaultEvent.FAULT, function (evt:FaultEvent):void {
+				gotFault(evt, url);
+			});
 			
 			req.send(vars);
 		}
