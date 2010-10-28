@@ -6,6 +6,7 @@ package biz.int80h
 	import mx.collections.ArrayCollection;
 	import mx.core.Application;
 	import mx.core.ClassFactory;
+	import mx.core.FlexGlobals;
 	
 	[Bindable] public class AppControllerBase extends EventDispatcher implements IAppController
 	{
@@ -22,13 +23,13 @@ package biz.int80h
 		{
 		}
 		
-		public function getApiUrl(path:String, args:URLVariables=null):String {
-			var urlRoot:String = Application.application.parameters.base_url;
+		public function getApiUrl(path:String="", args:URLVariables=null):String {
+			var urlRoot:String = FlexGlobals.topLevelApplication.parameters.base_url;
 			
 			if (! urlRoot) {
 				urlRoot = this.defaultApiUrl();
 				if (! urlRoot)
-					urlRoot = "http://localhost:3002";
+					urlRoot = "http://localhost:3000";
 			}
 			
 			var url:String = urlRoot + "/api/" + path;

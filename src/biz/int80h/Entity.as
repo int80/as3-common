@@ -103,7 +103,7 @@ package biz.int80h
 		
 		public function deleteEntity(callback:Function=null):void {
 			var self:Entity = this;
-			this.doRequest("/" + this.id + "", function (evt:ResultEvent):void {
+			this.doRequest("/" + this.id, function (evt:ResultEvent):void {
 				if (callback != null)
 					callback(self);
 			}, "DELETE", this.primaryKey());
@@ -240,7 +240,7 @@ package biz.int80h
 			
 			var req:RESTService = new RESTService();
 			req.method = method;
-			req.apiUrl = "rest/" + this.className + url;
+			req.url = "rest/" + this.className + url;
 			req.addEventListener(ResultEvent.RESULT, cb);
 			req.addEventListener(FaultEvent.FAULT, function (evt:FaultEvent):void {
 				gotFault(evt, url);

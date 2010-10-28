@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<flexLibProperties version="1">
+<flexLibProperties includeAllClasses="false" version="1">
   <includeClasses>
     <classEntry path="biz.int80h.Window"/>
     <classEntry path="biz.int80h.AppControllerBase"/>
@@ -9,6 +9,8 @@
     <classEntry path="biz.int80h.EntitiesLoadedEvent"/>
     <classEntry path="biz.int80h.Entity"/>
     <classEntry path="biz.int80h.ConfirmDialog"/>
+    <classEntry path="biz.int80h.ResizableWindow"/>
+    <classEntry path="biz.int80h.ResizableWindowSkin"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

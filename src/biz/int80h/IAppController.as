@@ -7,7 +7,7 @@ package biz.int80h
 	
 	public interface IAppController extends IEventDispatcher
 	{
-		function getApiUrl(path:String, args:URLVariables=null):String;
+		function getApiUrl(path:String="", args:URLVariables=null):String;
 		function loadAllEntities(entityClass:Class, opts:Object=null, cb:Function=null):void;
 		function defaultApiUrl():String;
 		function getAllEntitiesFiltered(entityClass:Class, filterField:String, filterValue:Object=null):ArrayCollection;
