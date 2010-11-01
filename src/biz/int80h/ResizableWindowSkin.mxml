@@ -85,8 +85,8 @@ in accordance with the terms of the license agreement accompanying it.
 				
 				dropShadow.tlRadius = cornerRadius;
 				dropShadow.trRadius = cornerRadius;
-				dropShadow.blRadius = withControls ? cornerRadius : 0;
-				dropShadow.brRadius = withControls ? cornerRadius : 0;
+				dropShadow.blRadius = withControls ? cornerRadius : 5;
+				dropShadow.brRadius = withControls ? cornerRadius : 5;
 				
 				setPartCornerRadii(topMaskRect, withControls); 
 				setPartCornerRadii(border, withControls); 
@@ -110,8 +110,8 @@ in accordance with the terms of the license agreement accompanying it.
 		{            
 			target.topLeftRadiusX = cornerRadius;
 			target.topRightRadiusX = cornerRadius;
-			target.bottomLeftRadiusX = includeBottom ? cornerRadius : 0;
-			target.bottomRightRadiusX = includeBottom ? cornerRadius : 0;
+			target.bottomLeftRadiusX = includeBottom ? cornerRadius : 5;
+			target.bottomRightRadiusX = includeBottom ? cornerRadius : 5;
 		}
 		
 		private var cornerRadius:Number;
@@ -185,9 +185,9 @@ in accordance with the terms of the license agreement accompanying it.
 				<s:Rect id="tbFill" left="0" right="0" top="0" bottom="1">
 					<s:fill>
 						<s:LinearGradient rotation="90">
-							<s:GradientEntry color="0xD2D2D2"
+							<s:GradientEntry color="0x336699"
 											 color.inactiveGroup="0xEAEAEA"/>
-							<s:GradientEntry color="0x9A9A9A"
+							<s:GradientEntry color="0x336699"
 											 color.inactiveGroup="0xCECECE"/>
 						</s:LinearGradient>
 					</s:fill>
@@ -197,7 +197,7 @@ in accordance with the terms of the license agreement accompanying it.
 				<s:Rect id="tbHilite" left="0" right="0" top="0" bottom="0">
 					<s:stroke>
 						<s:LinearGradientStroke rotation="90" weight="1">
-							<s:GradientEntry color="0xE6E6E6" />
+							<s:GradientEntry color="0x336699"/>
 							<s:GradientEntry color="0xFFFFFF" alpha="0.22"/>
 						</s:LinearGradientStroke>
 					</s:stroke>
@@ -213,7 +213,7 @@ in accordance with the terms of the license agreement accompanying it.
 				<!--- layer 2: title bar divider @private -->
 				<s:Rect id="tbDiv" left="0" right="0" height="1" bottom="0">
 					<s:fill>
-						<s:SolidColor color="0x000000" alpha="0.75" />
+						<s:SolidColor color="0x336699" alpha="0.75" />
 					</s:fill>
 				</s:Rect>
 				
@@ -228,7 +228,7 @@ in accordance with the terms of the license agreement accompanying it.
 				<s:Group id="moveArea" left="0" right="0" top="0" bottom="0" />
 				
 				<!--- @copy spark.components.TitleWindow#closeButton -->
-				<s:Button id="closeButton" skinClass="spark.skins.spark.TitleWindowCloseButtonSkin"
+				<s:Button id="closeButton" color="0x666666" skinClass="spark.skins.spark.TitleWindowCloseButtonSkin"
 						  width="15" height="15" right="7" top="7" />
 			</s:Group>
 			
@@ -250,7 +250,7 @@ in accordance with the terms of the license agreement accompanying it.
 					<!-- layer 0: control bar divider line -->
 					<s:Rect left="0" right="0" top="0" height="1" alpha="0.22">
 						<s:fill>
-							<s:SolidColor color="0x000000" />
+							<s:SolidColor color="0x336699" />
 						</s:fill>
 					</s:Rect>
 					
@@ -258,8 +258,8 @@ in accordance with the terms of the license agreement accompanying it.
 					<s:Rect left="0" right="0" top="1" bottom="0">
 						<s:stroke>
 							<s:LinearGradientStroke rotation="90" weight="1">
-								<s:GradientEntry color="0xFFFFFF" />
-								<s:GradientEntry color="0xD8D8D8" />
+								<s:GradientEntry color="0x336699"/>
+								<s:GradientEntry color="0xFFFFFF"/>
 							</s:LinearGradientStroke>
 						</s:stroke>
 					</s:Rect>
@@ -268,8 +268,8 @@ in accordance with the terms of the license agreement accompanying it.
 					<s:Rect left="1" right="1" top="2" bottom="1">
 						<s:fill>
 							<s:LinearGradient rotation="90">
-								<s:GradientEntry color="0xEDEDED"/>
-								<s:GradientEntry color="0xCDCDCD"/>
+								<s:GradientEntry color="0x336699"/>
+								<s:GradientEntry color="0xFFFFFF"/>
 							</s:LinearGradient>
 						</s:fill>
 					</s:Rect>
@@ -288,7 +288,7 @@ in accordance with the terms of the license agreement accompanying it.
 		<s:Group id="resizeHandle" right="1" bottom="1" width="15" height="15">
 			<s:Path data="M 4 13 L 13 4 L 13 13 L 4 13">
 				<s:fill>
-					<s:SolidColor color="0x000000" />
+					<s:SolidColor color="0x666666" />
 				</s:fill>
 			</s:Path>
 		</s:Group>
