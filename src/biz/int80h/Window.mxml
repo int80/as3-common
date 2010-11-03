@@ -2,7 +2,8 @@
 <s:TitleWindow xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:fx="http://ns.adobe.com/mxml/2009"
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   addedEffect="Fade" hideEffect="Fade" removedEffect="Fade" showEffect="Fade" 
-			   width="400" height="300" creationComplete="_setup()" close="_closeHandler(event)">
+			   width="400" height="300" contentCreationComplete="_setup()" close="_closeHandler(event)"
+			   >
 	
 	<fx:Declarations>
 		<fx:Boolean id="centered">true</fx:Boolean>
@@ -16,6 +17,7 @@
 		<![CDATA[
 			import flash.utils.describeType;
 			
+			import mx.controls.Alert;
 			import mx.events.CloseEvent;
 			import mx.managers.PopUpManager;
 			
@@ -38,7 +40,11 @@
 					return null;
 				}
 				
-				return "windowState:" + className;
+				// make className alphanumeric
+				className = className.replace('.', '_');
+				className = className.replace('::', '_');
+				
+				return "windowState_" + className;
 			}
 			
 			// load location and dimensions from sharedobject storage
@@ -46,13 +52,13 @@
 				var savedState:SharedObject = getSharedObject();
 				if (! savedState) return false;
 				
-				var savedLeft:int = savedState.data.left;
-				var savedTop:int = savedState.data.top;
-				var savedWidth:int = savedState.data.width;
-				var savedHeight:int = savedState.data.height;
+				var savedLeft:Number = savedState.data.left;
+				var savedTop:Number = savedState.data.top;
+				var savedWidth:Number = savedState.data.width;
+				var savedHeight:Number = savedState.data.height;
 				
 				// sanity check dimensions
-				if (! savedLeft && ! savedTop && ! savedWidth && ! savedHeight)
+				if (! savedLeft && ! savedTop)
 					return false;
 				if (! savedWidth || ! savedHeight)
 					return false;
@@ -61,12 +67,14 @@
 				
 				// force dimensions to be within the current screen size
 				var parentWidth:int = this.parentApplication.width;
-				trace("parent width: " + parentWidth);
 				var parentHeight:int = this.parentApplication.height;
-				trace("parent height: " + parentHeight);
+				if (savedLeft >= parentWidth - 10) return false;
+				if (savedTop >= parentHeight - 10) return false;
+				if (savedLeft + savedWidth >= parentWidth) return false;
+				if (savedTop + savedHeight >= parentHeight) return false;
 				
-				this.left = savedLeft;
-				this.top = savedTop;
+				this.x = savedLeft;
+				this.y = savedTop;
 				this.width = savedWidth;
 				this.height = savedHeight;
 				
@@ -76,11 +84,13 @@
 			private function saveDimensions():void {
 				var savedState:SharedObject = getSharedObject();
 				if (! savedState) return;
+
+				var bounds:Rectangle = this.getBounds(this.parent);
 				
-				savedState.data.left = this.left;
-				savedState.data.top = this.top;
-				savedState.data.width = this.width;
-				savedState.data.height = this.height;
+				savedState.data.left = bounds.left;
+				savedState.data.top = bounds.top;
+				savedState.data.width = bounds.width;
+				savedState.data.height = bounds.height;
 				savedState.flush();
 			}
 			
