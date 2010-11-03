@@ -14,17 +14,92 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import flash.utils.describeType;
+			
 			import mx.events.CloseEvent;
 			import mx.managers.PopUpManager;
 			
 			import spark.components.TitleWindow;
 			
 			private function _setup():void {
-				if (this.centered)
-					PopUpManager.centerPopUp(this);
+				// load dimensions
+				if (! this.loadDimensions()) {
+					if (this.centered)
+						PopUpManager.centerPopUp(this);
+				}
+			}
+			
+			private function getSharedObjectKey():String {
+				// get this window's class name, use it to save location/dimensions
+				var classInfo:XML = describeType(this);
+				var className:String = classInfo.@name.toString();
+				if (! className) {
+					trace("Failed to load class name for window state");
+					return null;
+				}
+				
+				return "windowState:" + className;
+			}
+			
+			// load location and dimensions from sharedobject storage
+			private function loadDimensions():Boolean {
+				var savedState:SharedObject = getSharedObject();
+				if (! savedState) return false;
+				
+				var savedLeft:int = savedState.data.left;
+				var savedTop:int = savedState.data.top;
+				var savedWidth:int = savedState.data.width;
+				var savedHeight:int = savedState.data.height;
+				
+				// sanity check dimensions
+				if (! savedLeft && ! savedTop && ! savedWidth && ! savedHeight)
+					return false;
+				if (! savedWidth || ! savedHeight)
+					return false;
+				if (savedWidth < 10 || savedHeight < 10)
+					return false;
+				
+				// force dimensions to be within the current screen size
+				var parentWidth:int = this.parentApplication.width;
+				trace("parent width: " + parentWidth);
+				var parentHeight:int = this.parentApplication.height;
+				trace("parent height: " + parentHeight);
+				
+				this.left = savedLeft;
+				this.top = savedTop;
+				this.width = savedWidth;
+				this.height = savedHeight;
+				
+				return true;
+			}
+			
+			private function saveDimensions():void {
+				var savedState:SharedObject = getSharedObject();
+				if (! savedState) return;
+				
+				savedState.data.left = this.left;
+				savedState.data.top = this.top;
+				savedState.data.width = this.width;
+				savedState.data.height = this.height;
+				savedState.flush();
+			}
+			
+			private function getSharedObject():SharedObject {
+				var className:String = this.getSharedObjectKey();
+				if (! className) return null;
+				
+				var savedState:SharedObject;
+				try {
+					savedState = SharedObject.getLocal(className);
+				} catch (error:Error) {
+					trace("Unable to create SharedObject\n" + error.message);
+				}
+				
+				return savedState;
 			}
 			
 			private function _closeHandler(evt:CloseEvent):void {
+				saveDimensions();
 				postClose();
 			}
 			
