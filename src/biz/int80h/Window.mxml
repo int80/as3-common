@@ -26,8 +26,8 @@
 			private function _setup():void {
 				// load dimensions
 				if (! this.loadDimensions()) {
-					if (this.centered)
-						PopUpManager.centerPopUp(this);
+					//if (this.centered)
+					//	PopUpManager.centerPopUp(this);
 				}
 			}
 			
