@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="false" version="1">
   <includeClasses>
     <classEntry path="biz.int80h.Window"/>
@@ -12,6 +12,7 @@
     <classEntry path="biz.int80h.ResizableWindow"/>
     <classEntry path="biz.int80h.ResizableWindowSkin"/>
     <classEntry path="biz.int80h.PandaButton"/>
+    <classEntry path="biz.int80h.PandaCloseButton"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

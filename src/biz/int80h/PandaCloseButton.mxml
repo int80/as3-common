@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+
+    ADOBE SYSTEMS INCORPORATED
+    Copyright 2008 Adobe Systems Incorporated
+    All Rights Reserved.
+    
+    NOTICE: Adobe permits you to use, modify, and distribute this file
+    in accordance with the terms of the license agreement accompanying it.
+
+-->
+
+<!--- The default skin class for the close button of the Spark TitleWindow component.  
+
+     @see spark.skins.spark.TitleWindowSkin     
+     @see spark.components.TitleWindow
+
+     @langversion 3.0
+     @playerversion Flash 10
+     @playerversion AIR 1.5
+     @productversion Flex 4
+-->
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" xmlns:s="library://ns.adobe.com/flex/spark"
+    xmlns:fb="http://ns.adobe.com/flashbuilder/2009" alpha.disabled="0.5">
+    <fx:Metadata>[HostComponent("spark.skins.spark.TitleWindowCloseButtonSkin")]</fx:Metadata>
+    
+    <!-- host component -->
+    <fx:Script fb:purpose="styling">
+ 
+    </fx:Script>
+    
+    <s:states>
+        <s:State name="up" />
+        <s:State name="over"/>
+        <s:State name="down" />
+        <s:State name="disabled" />
+    </s:states>
+    
+    <!--- Define the drop shadow for the close button. -->
+    <s:RectangularDropShadow id="dropShadow" blurX="0" blurY="0" alpha="0" 
+                             alpha.over="0.55" alpha.down=".85" distance="1"
+                             angle="90" color="0x336699" left="0" top="0" right="0" bottom="0"/>
+    
+    <!--- Define the border and fill. -->
+    <s:Rect left="0" top="0" right="0" bottom="0" radiusX="3" radiusY="3">
+        <s:stroke>
+            <s:SolidColorStroke color="0x336699"
+                                alpha="1"
+                                alpha.over="0.7"
+                                alpha.down="0.7"
+                                weight="1"/>
+        </s:stroke>
+        <s:fill>
+            <s:SolidColor color="0x336699" alpha="1" alpha.down="0.5" alpha.over="0.5"/>
+        </s:fill>
+    </s:Rect>
+    
+    <!--- Define the inner shadow. -->
+    <s:Rect id="cbshad" left="1" right="1" top="1" height="1"  radiusX="3" radiusY="3" >
+        <s:fill>
+            <s:SolidColor color="0x336699" color.over="0x336699" alpha="0" alpha.over=".85" alpha.down="0.95" alpha.disabled=".05" />
+        </s:fill>
+    </s:Rect>
+    
+    <!--- Defines the appearance of the x in the close button. -->
+    <s:Group bottom="1" id="xSymbol" styleName="xButton" verticalCenter="0" horizontalCenter="0">     
+        <s:Path blendMode="normal" alpha=".5" alpha.over="1" 
+                data="M13.588,15.846l-3.487-4.226l-3.575,4.226c-0.517,0.592-0.954,1.014-1.312,1.264c-0.359,0.252-0.812,0.379-1.365,0.379
+				c-0.61,0-1.13-0.158-1.558-0.473c-0.429-0.315-0.643-0.678-0.643-1.081c0-0.416,0.329-1.014,0.986-1.789l4.35-5.14L3.127,4.72
+				C2.458,4.013,2.123,3.398,2.123,2.876c0-0.407,0.2-0.76,0.598-1.061c0.4-0.3,0.922-0.45,1.568-0.45c0.564,0,1.03,0.13,1.4,0.392
+				c0.369,0.262,0.801,0.673,1.294,1.234l3.117,3.515l3.028-3.515c0.506-0.581,0.943-0.997,1.312-1.249
+				c0.371-0.251,0.832-0.377,1.383-0.377c0.636,0,1.162,0.148,1.576,0.443c0.417,0.296,0.627,0.651,0.627,1.068
+				c0,0.3-0.086,0.587-0.256,0.864C17.6,4.016,17.339,4.342,16.986,4.72l-3.857,4.286l4.352,5.14c0.681,0.806,1.02,1.411,1.02,1.815
+				c0,0.419-0.21,0.776-0.633,1.077c-0.423,0.299-0.947,0.45-1.568,0.45c-0.551,0-1.019-0.132-1.401-0.395
+				C14.518,16.834,14.082,16.417,13.588,15.846z">
+            <s:fill>
+                <!--- @private -->
+                <s:SolidColor id="xFill1" color="0xFFFFFF" />
+            </s:fill>
+        </s:Path>
+        
+        <s:Path blendMode="normal" alpha="0"
+                data="M13.588,15.846l-3.487-4.226l-3.575,4.226c-0.517,0.592-0.954,1.014-1.312,1.264c-0.359,0.252-0.812,0.379-1.365,0.379
+				c-0.61,0-1.13-0.158-1.558-0.473c-0.429-0.315-0.643-0.678-0.643-1.081c0-0.416,0.329-1.014,0.986-1.789l4.35-5.14L3.127,4.72
+				C2.458,4.013,2.123,3.398,2.123,2.876c0-0.407,0.2-0.76,0.598-1.061c0.4-0.3,0.922-0.45,1.568-0.45c0.564,0,1.03,0.13,1.4,0.392
+				c0.369,0.262,0.801,0.673,1.294,1.234l3.117,3.515l3.028-3.515c0.506-0.581,0.943-0.997,1.312-1.249
+				c0.371-0.251,0.832-0.377,1.383-0.377c0.636,0,1.162,0.148,1.576,0.443c0.417,0.296,0.627,0.651,0.627,1.068
+				c0,0.3-0.086,0.587-0.256,0.864C17.6,4.016,17.339,4.342,16.986,4.72l-3.857,4.286l4.352,5.14c0.681,0.806,1.02,1.411,1.02,1.815
+				c0,0.419-0.21,0.776-0.633,1.077c-0.423,0.299-0.947,0.45-1.568,0.45c-0.551,0-1.019-0.132-1.401-0.395
+				C14.518,16.834,14.082,16.417,13.588,15.846z">
+            <s:fill>
+                <!--- @private -->
+                <s:SolidColor id="xFill2" color="0xFFFFFF" />
+            </s:fill>
+        </s:Path>
+        
+        <s:Path blendMode="normal" alpha=".0"
+                data="M13.588,15.846l-3.487-4.226l-3.575,4.226c-0.517,0.592-0.954,1.014-1.312,1.264c-0.359,0.252-0.812,0.379-1.365,0.379
+				c-0.61,0-1.13-0.158-1.558-0.473c-0.429-0.315-0.643-0.678-0.643-1.081c0-0.416,0.329-1.014,0.986-1.789l4.35-5.14L3.127,4.72
+				C2.458,4.013,2.123,3.398,2.123,2.876c0-0.407,0.2-0.76,0.598-1.061c0.4-0.3,0.922-0.45,1.568-0.45c0.564,0,1.03,0.13,1.4,0.392
+				c0.369,0.262,0.801,0.673,1.294,1.234l3.117,3.515l3.028-3.515c0.506-0.581,0.943-0.997,1.312-1.249
+				c0.371-0.251,0.832-0.377,1.383-0.377c0.636,0,1.162,0.148,1.576,0.443c0.417,0.296,0.627,0.651,0.627,1.068
+				c0,0.3-0.086,0.587-0.256,0.864C17.6,4.016,17.339,4.342,16.986,4.72l-3.857,4.286l4.352,5.14c0.681,0.806,1.02,1.411,1.02,1.815
+				c0,0.419-0.21,0.776-0.633,1.077c-0.423,0.299-0.947,0.45-1.568,0.45c-0.551,0-1.019-0.132-1.401-0.395
+				C14.518,16.834,14.082,16.417,13.588,15.846z">
+            <s:fill>
+                <s:SolidColor color="0xffffff" />
+            </s:fill>
+        </s:Path>
+    </s:Group>
+</s:SparkSkin>
