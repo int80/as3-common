@@ -19,6 +19,7 @@
 			
 			import mx.controls.Alert;
 			import mx.events.CloseEvent;
+			import mx.events.MoveEvent;
 			import mx.managers.PopUpManager;
 			
 			import spark.components.TitleWindow;
@@ -29,6 +30,16 @@
 					//if (this.centered)
 					//	PopUpManager.centerPopUp(this);
 				}
+				
+				this.addEventListener(MoveEvent.MOVE, windowMoved);
+			}
+			
+			protected function windowMoved(event:MoveEvent):void {
+				if (x < 0) move(0, y);
+				if (y < 0) move(x, 0);
+				
+				if (x + width > parent.width) move(parent.width - width, y);
+				if (y + height > parent.height) move(x, parent.height - height);
 			}
 			
 			private function getSharedObjectKey():String {

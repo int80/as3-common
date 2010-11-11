@@ -6,6 +6,7 @@ package biz.int80h
 	import flash.geom.Point;
 	
 	import mx.core.UIComponent;
+	import mx.events.MoveEvent;
 	import mx.events.SandboxMouseEvent;
 	
 	public class ResizableWindow extends Window
@@ -16,6 +17,7 @@ package biz.int80h
 		
 		[SkinPart("false")]
 		public var resizeHandle:UIComponent;
+		
 		
 		override protected function partAdded(partName:String, instance:Object) : void
 		{
