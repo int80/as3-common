@@ -37,12 +37,12 @@ in accordance with the terms of the license agreement accompanying it.
 	<fx:Script fb:purpose="styling">
 		/* Define the skin elements that should not be colorized. 
 		For panel, border and title background are skinned, but the content area and title text are not. */
-		static private const exclusions:Array = ["background", "titleDisplay", "contentGroup"];
+		/*static private const exclusions:Array = ["background", "titleDisplay", "contentGroup"];
 		
 		/**
 		 * @private
 		 */  
-		override public function get colorizeExclusions():Array {return exclusions;}
+		/*override public function get colorizeExclusions():Array {return exclusions;}*/
 		
 		/**
 		 * @private
@@ -115,6 +115,7 @@ in accordance with the terms of the license agreement accompanying it.
 		}
 		
 		private var cornerRadius:Number;
+		
 	</fx:Script>
 	
 	<s:states>
