@@ -150,7 +150,7 @@ package biz.int80h
 			}, "GET", search);
 		}
 		
-		public function update(fields:Object):void {
+		public function update(fields:Object, cb:Function=null):void {
 			var self:Entity = this;
 			
 			var pk:Object = this.primaryKey();
@@ -160,7 +160,11 @@ package biz.int80h
 				fields[String(key)] = pk[key];
 			}
 			
-			doRequest("/" + this.id, function (evt:ResultEvent):void { self.updateComplete(evt) }, "POST", fields);
+			doRequest("/" + this.id, function (evt:ResultEvent):void {
+				self.updateComplete(evt);
+				if (cb)
+					cb();
+			}, "POST", fields);
 		}
 		
 		
