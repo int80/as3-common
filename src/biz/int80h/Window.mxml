@@ -71,6 +71,8 @@
 				// sanity check dimensions
 				if (! savedLeft && ! savedTop)
 					return false;
+				if (savedLeft < 0 || savedTop < 0)
+					return false;
 				if (! savedWidth || ! savedHeight)
 					return false;
 				if (savedWidth < 10 || savedHeight < 10)
