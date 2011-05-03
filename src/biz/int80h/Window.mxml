@@ -35,11 +35,11 @@
 			}
 			
 			protected function windowMoved(event:MoveEvent):void {
-				if (x < 0) move(0, y);
-				if (y < 0) move(x, 0);
-				
 				if (x + width > parent.width) move(parent.width - width, y);
 				if (y + height > parent.height) move(x, parent.height - height);
+				
+				if (x < 0) move(0, y);
+				if (y < 0) move(x, 0);
 			}
 			
 			private function getSharedObjectKey():String {
