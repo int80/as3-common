@@ -110,15 +110,15 @@ package biz.int80h
 		}
 				
 		[Bindable(event="EntitiesUpdated")] public function get all():ArrayCollection {
-			if (! Entity._entities[this.className]) {
-				Entity._entities[this.className] = new ArrayCollection();
-			}
-			
-			return Entity._entities[this.className];
+			return getEntities(this.className);
 		}
 		
 		[Bindable(event="EntitiesUpdated")]
 		static public function getEntities(className:String):ArrayCollection {
+			if (! Entity._entities[className]) {
+				Entity._entities[className] = new ArrayCollection();
+			}
+			
 			return _entities[className];
 		}
 		
@@ -153,16 +153,22 @@ package biz.int80h
 		public function update(fields:Object, cb:Function=null):void {
 			var self:Entity = this;
 			
+			// add primary key fields for update
 			var pk:Object = this.primaryKey();
-			for (var key:String in pk) {
-				if (fields[key] || key == 'search.id') continue;
+			for (var pkey:String in pk) {
+				if (fields[pkey] || pkey == 'search.id') continue;
+				fields[String(pkey)] = pk[pkey];
+			}
 				
-				fields[String(key)] = pk[key];
+			// update singleton immediately
+			for (var fkey:String in fields) {
+				trace("set " + fkey + " to " fields[fkey]);
+				self[fkey] = fields[fkey];
 			}
 			
 			doRequest("/" + this.id, function (evt:ResultEvent):void {
 				self.updateComplete(evt);
-				if (cb)
+				if (cb != null)
 					cb();
 			}, "POST", fields);
 		}

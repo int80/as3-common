@@ -35,8 +35,8 @@
 			}
 			
 			protected function windowMoved(event:MoveEvent):void {
-				if (x + width > parent.width) move(parent.width - width, y);
-				if (y + height > parent.height) move(x, parent.height - height);
+				if (x + width > parent.width && parent.width - width > 0) x = parent.width - width;
+				if (y + height > parent.height && parent.height - height > 0) y = parent.height - height;
 				
 				if (x < 0) move(0, y);
 				if (y < 0) move(x, 0);
