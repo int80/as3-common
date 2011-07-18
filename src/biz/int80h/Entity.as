@@ -162,7 +162,6 @@ package biz.int80h
 				
 			// update singleton immediately
 			for (var fkey:String in fields) {
-				trace("set " + fkey + " to " fields[fkey]);
 				self[fkey] = fields[fkey];
 			}
 			
