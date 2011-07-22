@@ -24,7 +24,7 @@ package biz.int80h
 		// this does not affect singleton ArrayCollections accessed with all()
 		public static var USE_SINGLETONS_ONLY:Boolean = true;
 
-		public static var DEBUG:Boolean = true;
+		public static var DEBUG:Boolean = false;
 
 		// constructor
 		public function Entity(fields:Object=null) {
