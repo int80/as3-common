@@ -24,18 +24,18 @@ package biz.int80h
 		// this does not affect singleton ArrayCollections accessed with all()
 		public static var USE_SINGLETONS_ONLY:Boolean = true;
 
-		public static var DEBUG:Boolean = false;
+		public static var DEBUG:Boolean = true;
 
 		// constructor
 		public function Entity(fields:Object=null) {
 			this.setFields(fields);
 		}
 		
-		
-		// override in subclass
-		// entity class name and REST path
-		// maybe can be _classIdentifier?
-		public virtual function get className():String { return "noclass" };
+		// use this instead of auto-generated _classIdentifier
+		// "shadow" this in your subclass if you wish to use a different name
+		// for the entity class and REST path part
+		// (this is the only way to inherit a static property associated with a class)
+		private static const classIdentifier:String = null;
 		
 		// trace if DEBUG
 		protected static function debug(str:String):void {
@@ -354,6 +354,9 @@ package biz.int80h
 		}
 		
 		protected function get _classIdentifier():String {
+			if (Object(this.constructor).classIdentifier)
+				return Object(this.constructor).classIdentifier;
+			
 			return Entity._classIdentifier(this._class);
 		}
 		
@@ -362,6 +365,16 @@ package biz.int80h
 			// get type name
 			var typeInfo:Object = describeType(c);
 			var cname:String = typeInfo.@name;
+			
+			// is there a "shadowed" (inherited static constant) that should
+			// be used instead of an auto-generated class identifier name?
+			var ti:XMLList = typeInfo..constant.(@name == 'classIdentifier');
+			if (ti.length()) {
+				debug("found static classid: " + Object(c).classIdentifier);
+				// return static const classIdentifier property
+				// for some reason it needs to be cast as Object first
+				return Object(c).classIdentifier;
+			}
 			
 			// cname is now something like "com.doctorbase.entity::Appointment"
 			// transform into "notification"
@@ -376,7 +389,7 @@ package biz.int80h
 			// transform CamelCase into reasonable_names
 			cname = cname.replace(/(.)([A-Z])/, "$1_$2");
 			cname = cname.toLowerCase();
-			
+						
 			debug("_classIdentifier(" + c + ") = " + cname);
 			return cname;
 		}
