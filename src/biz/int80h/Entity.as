@@ -155,9 +155,9 @@ package biz.int80h
 			doRequest(
 				"", 
 				function (evt:ResultEvent):void {
+					self.loadComplete(evt);
 					if (cb != null)
 						cb.apply(self);
-					self.loadComplete(evt);
 				},
 				"GET",
 				self.primaryKey()
