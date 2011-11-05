@@ -120,6 +120,11 @@ package biz.int80
 		public function deleteEntity(callback:Function=null):void {
 			var self:Entity = this;
 			this.doRequest("/" + this.id, function (evt:ResultEvent):void {
+				// remove self from singleton list
+				var entities:ArrayCollection = self.all;
+				var idx:int = entities.getItemIndex(self);
+				if (idx > -1) entities.removeItemAt(idx);
+				
 				if (callback != null)
 					callback(self);
 			}, "DELETE", this.primaryKey());
@@ -150,9 +155,9 @@ package biz.int80
 			doRequest(
 				"", 
 				function (evt:ResultEvent):void {
+					self.loadComplete(evt);
 					if (cb != null)
 						cb.apply(self);
-					self.loadComplete(evt);
 				},
 				"GET",
 				self.primaryKey()
