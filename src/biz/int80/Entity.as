@@ -1,4 +1,4 @@
-package biz.int80h
+package biz.int80
 {
 	import flash.events.EventDispatcher;
 	import flash.net.URLVariables;
@@ -24,7 +24,7 @@ package biz.int80h
 		// this does not affect singleton ArrayCollections accessed with all()
 		public static var USE_SINGLETONS_ONLY:Boolean = true;
 
-		public static var DEBUG:Boolean = true;
+		public static var DEBUG:Boolean = false;
 
 		// constructor
 		public function Entity(fields:Object=null) {
@@ -269,7 +269,7 @@ package biz.int80h
 		
 		// creates a new instance or returns one if one already exists
 		// unique singleton id is class / PK
-		static protected function getSingleton(rowObj:Object, ctor:Class):Entity {
+		static public function getSingleton(rowObj:Object, ctor:Class):Entity {
 			var singletons:Object = Entity._singletons[ctor];
 			if (! singletons)
 				singletons = Entity._singletons[ctor] = new Object();
@@ -370,7 +370,7 @@ package biz.int80h
 			// be used instead of an auto-generated class identifier name?
 			var ti:XMLList = typeInfo..constant.(@name == 'classIdentifier');
 			if (ti.length()) {
-				debug("found static classid: " + Object(c).classIdentifier);
+				debug("found static classid for " + cname + ": " + Object(c).classIdentifier);
 				// return static const classIdentifier property
 				// for some reason it needs to be cast as Object first
 				return Object(c).classIdentifier;

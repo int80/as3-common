@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<int80h:Window xmlns:int80h="biz.int80h.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="554" height="130">
+<int80:Window xmlns:int80="biz.int80.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="554" height="130">
 	<mx:String id="question"></mx:String>
 	
 	<mx:Metadata>
@@ -19,4 +19,4 @@
 	<mx:Button x="481" y="58" label="OK" click="this.confirm()"/>
 	<mx:Button x="410" y="58" label="Cancel" click="this.postClose()"/>
 	
-</int80h:Window>
+</int80:Window>

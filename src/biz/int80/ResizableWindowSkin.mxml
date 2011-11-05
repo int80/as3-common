@@ -30,7 +30,7 @@ in accordance with the terms of the license agreement accompanying it.
 		/** 
 		* @copy spark.skins.spark.ApplicationSkin#hostComponent
 		*/
-		[HostComponent("biz.int80h.ResizableWindow")]
+		[HostComponent("biz.int80.ResizableWindow")]
 		]]>
 	</fx:Metadata> 
 	
@@ -229,7 +229,7 @@ in accordance with the terms of the license agreement accompanying it.
 				<s:Group id="moveArea" left="0" right="0" top="0" bottom="0" />
 				
 				<!--- @copy spark.components.TitleWindow#closeButton -->
-				<s:Button id="closeButton" skinClass="biz.int80h.PandaCloseButton"
+				<s:Button id="closeButton" skinClass="biz.int80.PandaCloseButton"
 						  width="20" height="20" right="7" top="7"/>
 			</s:Group>
 			

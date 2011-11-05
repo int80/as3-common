@@ -1,4 +1,4 @@
-package biz.int80h
+package biz.int80
 {
 	import flash.events.EventDispatcher;
 	import flash.net.URLVariables;
