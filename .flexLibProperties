@@ -13,6 +13,8 @@
     <classEntry path="biz.int80.ResizableWindowSkin"/>
     <classEntry path="biz.int80.PandaButton"/>
     <classEntry path="biz.int80.PandaCloseButton"/>
+    <classEntry path="biz.int80.PersistantDataGrid"/>
+    <classEntry path="biz.int80.IPersistantStorage"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

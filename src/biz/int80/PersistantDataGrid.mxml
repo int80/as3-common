@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			 xmlns:s="library://ns.adobe.com/flex/spark" 
+			 xmlns:mx="library://ns.adobe.com/flex/mx"
+			 creationComplete="setup()"
+			 >
+	
+	<!--
+	    this is a datagrid that remembers its column widths
+	-->
+	
+	<fx:Script source="PersistantStorage.as" />
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.dataGridClasses.DataGridColumn;
+			import mx.core.ScrollPolicy;
+			import mx.events.DataGridEvent;
+			import mx.events.IndexChangedEvent;
+			
+			private var loadingWidths:Boolean = false;
+			private var canSaveWidths:Boolean = false;
+			
+			private function setup():void {
+				loadSavedColumnWidths();
+				this.addEventListener(IndexChangedEvent.HEADER_SHIFT, saveColumnWidths);
+				this.addEventListener(DataGridEvent.COLUMN_STRETCH, saveColumnWidths);
+				
+				this.addEventListener(FocusEvent.FOCUS_IN, function (evt:Event):void { canSaveWidths = true });
+				//this.addEventListener(FocusEvent.FOCUS_OUT, function (evt:Event):void { trace("focus out") });
+			}
+			
+			public function loadSavedColumnWidths():void {
+				var so:SharedObject = this.sharedObject;
+				if (! so) return;
+				
+				var cols:Array = this.columns;
+				var savedWidths:Array = so.data.columnWidths;
+				if (! savedWidths) return;
+				
+				if (savedWidths.length > cols.length) return;
+				
+				loadingWidths = true;
+				
+				// read column widths
+				this.horizontalScrollPolicy = ScrollPolicy.ON;
+				
+				for (var i:int = 0; i < savedWidths.length; i++) {
+					var savedWidth:int = savedWidths[i];
+
+					if (savedWidth) {
+						// found saved column width
+						var col:DataGridColumn = cols[i];
+						if (col) col.width = savedWidth;
+					}
+					dumpCols();
+
+				}
+				
+				this.horizontalScrollPolicy = ScrollPolicy.OFF;
+
+				loadingWidths = false;
+			}
+			
+			public function saveColumnWidths(evt:Event=null):void {
+				if (loadingWidths) return;
+				
+				var so:SharedObject = this.sharedObject;
+				if (! so) return;
+				
+				var cols:Array = this.columns;
+				var savedWidths:Array = new Array();
+				
+				for (var i:int = 0; i < cols.length; i++) {
+					var col:DataGridColumn = cols[i];
+					var width:int = col.width;
+
+					if (! width) continue;
+					savedWidths[i] = width;
+				}
+			
+				so.data.columnWidths = savedWidths;
+				so.flush();
+			}
+			
+			private function dumpCols():void {
+				var cols:Array = this.columns;
+				
+				for (var i:int = 0; i < cols.length; i++) {
+					var col:DataGridColumn = cols[i];
+					var width:int = col.width;
+					trace("col " + i + " width: " + width);
+				}
+			}
+			
+			public function get sharedObjectPrefix():String {
+				var key:String = "persistantDataGridv1_";
+				if (this.id) key += this.id + "_";
+				return key;
+			}
+		]]>
+	</fx:Script>
+</mx:DataGrid>

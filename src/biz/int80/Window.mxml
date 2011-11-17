@@ -3,7 +3,7 @@
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   addedEffect="Fade" showEffect="Fade" 
 			   width="400" height="300" contentCreationComplete="_setup()" close="_closeHandler(event)"
-			   >
+			   implements="biz.int80.IPersistantStorage">
 	
 	<fx:Declarations>
 		<fx:Boolean id="centered">true</fx:Boolean>
@@ -12,6 +12,8 @@
 	<s:layout>
 		<s:BasicLayout/>
 	</s:layout>
+	
+	<fx:Script source="PersistantStorage.as" />
 	
 	<fx:Script>
 		<![CDATA[
@@ -24,12 +26,10 @@
 			
 			import spark.components.TitleWindow;
 			
+			public var resizable:Boolean = true;
+			
 			private function _setup():void {
-				// load dimensions
-				if (! this.loadDimensions()) {
-					//if (this.centered)
-					//	PopUpManager.centerPopUp(this);
-				}
+				this.loadDimensions();
 				
 				this.addEventListener(MoveEvent.MOVE, windowMoved);
 			}
@@ -42,37 +42,32 @@
 				if (y < 0) move(x, 0);
 			}
 			
-			private function getSharedObjectKey():String {
-				// get this window's class name, use it to save location/dimensions
-				var classInfo:XML = describeType(this);
-				var className:String = classInfo.@name.toString();
-				if (! className) {
-					trace("Failed to load class name for window state");
-					return null;
-				}
-				
-				// make className alphanumeric
-				className = className.replace('.', '_');
-				className = className.replace('::', '_');
-				
-				return "windowState_" + className;
+			public function get sharedObjectPrefix():String {
+				return "windowStatev1_";
 			}
 			
 			// load location and dimensions from sharedobject storage
 			private function loadDimensions():Boolean {
-				var savedState:SharedObject = getSharedObject();
+				var savedState:SharedObject = this.sharedObject;
 				if (! savedState) return false;
 				
+				// load position
 				var savedLeft:Number = savedState.data.left;
 				var savedTop:Number = savedState.data.top;
-				var savedWidth:Number = savedState.data.width;
-				var savedHeight:Number = savedState.data.height;
-				
-				// sanity check dimensions
 				if (! savedLeft && ! savedTop)
 					return false;
 				if (savedLeft < 0 || savedTop < 0)
 					return false;
+				this.x = savedLeft;
+				this.y = savedTop;
+				
+				if (! this.resizable) return true;
+				
+				// load width/height
+				var savedWidth:Number = savedState.data.width;
+				var savedHeight:Number = savedState.data.height;
+				
+				// sanity check dimensions
 				if (! savedWidth || ! savedHeight)
 					return false;
 				if (savedWidth < 10 || savedHeight < 10)
@@ -86,8 +81,6 @@
 				if (savedLeft + savedWidth >= parentWidth) return false;
 				if (savedTop + savedHeight >= parentHeight) return false;
 				
-				this.x = savedLeft;
-				this.y = savedTop;
 				this.width = savedWidth;
 				this.height = savedHeight;
 				
@@ -95,7 +88,7 @@
 			}
 			
 			private function saveDimensions():void {
-				var savedState:SharedObject = getSharedObject();
+				var savedState:SharedObject = this.sharedObject;
 				if (! savedState) return;
 
 				var bounds:Rectangle = this.getBounds(this.parent);
@@ -106,20 +99,7 @@
 				savedState.data.height = bounds.height;
 				savedState.flush();
 			}
-			
-			private function getSharedObject():SharedObject {
-				var className:String = this.getSharedObjectKey();
-				if (! className) return null;
-				
-				var savedState:SharedObject;
-				try {
-					savedState = SharedObject.getLocal(className);
-				} catch (error:Error) {
-					trace("Unable to create SharedObject\n" + error.message);
-				}
-				
-				return savedState;
-			}
+		
 			
 			private function _closeHandler(evt:CloseEvent):void {
 				saveDimensions();
