@@ -2,6 +2,7 @@ package biz.int80
 {
 	import flash.events.EventDispatcher;
 	import flash.net.URLVariables;
+	import flash.system.Capabilities;
 	
 	import mx.collections.ArrayCollection;
 	import mx.core.Application;
@@ -84,6 +85,18 @@ package biz.int80
 		public function getAllEntities(entityClass:Class):ArrayCollection {
 			var ent:Entity = this.getEntitySingleton(entityClass);
 			return ent.all;
+		}
+		
+		public static function isDebugPlayer() :Boolean {
+			return Capabilities.isDebugger;
+		}
+		
+		public static function isDebugBuild() :Boolean {
+			return new Error().getStackTrace().search(/:[0-9]+]$/m) > -1;
+		}
+			
+		public static function isReleaseBuild() :Boolean {
+			return !isDebugBuild();
 		}
 	}
 }

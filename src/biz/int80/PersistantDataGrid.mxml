@@ -53,8 +53,6 @@
 						var col:DataGridColumn = cols[i];
 						if (col) col.width = savedWidth;
 					}
-					dumpCols();
-
 				}
 				
 				this.horizontalScrollPolicy = ScrollPolicy.OFF;

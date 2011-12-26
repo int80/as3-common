@@ -1,5 +1,6 @@
 package biz.int80
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.net.URLVariables;
 	import flash.utils.describeType;
@@ -220,20 +221,41 @@ package biz.int80
 			this.setFields(res.result.opt.data.list);
 			this.dispatchEvent(new Event("EntityLoaded"))
 		}
-				
+		
+		// for compatibility
 		protected static function loadEntitiesComplete(entityClass:Class, res:ResultEvent):void {
-			var cid:String = _classIdentifier(entityClass);
+			var cf:ClassFactory = new ClassFactory(entityClass);
+			return Entity.loadEntitiesCompleteWithFactory(cf, res);
+		}
+		
+		protected static function loadEntitiesCompleteWithFactory(entityClassFactory:ClassFactory, res:ResultEvent):void {
+			var cid:String = _classIdentifier(entityClassFactory.generator);
 			debug("loadEntitiesComplete for " + cid);
 			
 			var entityList:ArrayCollection = _entities[cid];
 			if (! entityList)
 				entityList = _entities[cid] = new ArrayCollection();
-				
-			if (! res || ! res.result || ! res.result.opt || ! res.result.opt.data)
+			
+			// response content should be in res.result.opt
+			// entity list should be in res.result.opt.data.list
+			
+			// we really should have these
+			if (! res || ! res.result)
+				return;
+			
+			// unable to parse XML, most likely non-2xx response
+			if (res.result is String) {
+				trace("Failed to parse response from " + _classIdentifier(entityClassFactory.generator) + ": " + res.result);
+				return;
+			}
+			
+			// empty response
+			if (! res.result.opt || ! res.result.opt.data)
 				return;
 				
+			// got our list of entities
 			if (res.result.opt.data.list)
-				Entity.instantiateList(res.result.opt.data.list, entityClass, entityList);
+				Entity.instantiateListWithFactory(res.result.opt.data.list, entityClassFactory, entityList);
 			else
 				entityList.removeAll();
 				
@@ -251,6 +273,10 @@ package biz.int80
 		
 		// populates listObj with entities of class ctor from data returned from the server in newList
 		static public function instantiateList(listObj:Object, ctor:Class, newList:ArrayCollection):void {
+			var cf:ClassFactory = new ClassFactory(ctor);
+			return instantiateListWithFactory(listObj, cf, newList);
+		}
+		static public function instantiateListWithFactory(listObj:Object, factory:ClassFactory, newList:ArrayCollection):void {
 			// force into arraycollection, even if it is a single object
 			var list:ArrayCollection = listObj as ArrayCollection;
 			if (! list && listObj) list = new ArrayCollection([ listObj ]);
@@ -261,10 +287,10 @@ package biz.int80
 				return;
 
 			for each (var entityFields:Object in list) {
-				var entityInstance:Entity = Entity.instantiateRow(entityFields, ctor);
+				var entityInstance:* = Entity.instantiateRow(entityFields, factory);
 				
 				if (! entityInstance) {
-					trace("Error instantiating " + ctor);
+					trace("Error instantiating " + factory);
 					continue;
 				}
 				
@@ -274,7 +300,9 @@ package biz.int80
 		
 		// creates a new instance or returns one if one already exists
 		// unique singleton id is class / PK
-		static public function getSingleton(rowObj:Object, ctor:Class):Entity {
+		static public function getSingleton(rowObj:Object, factory:ClassFactory):* {
+			var ctor:Class = factory.generator;
+			
 			var singletons:Object = Entity._singletons[ctor];
 			if (! singletons)
 				singletons = Entity._singletons[ctor] = new Object();
@@ -296,7 +324,7 @@ package biz.int80
 			if (! entityInstance) {
 				debug("failed to find singleton for " + ctor + " pk: " + pk);
 				// create new singleton
-				entityInstance = new ctor as Entity;
+				entityInstance = factory.newInstance();
 				singletons[pk] = entityInstance;
 			}
 			
@@ -309,14 +337,14 @@ package biz.int80
 			return entityInstance;
 		}
 		
-		// returns an Entity instance of ctor with the fields in rowObj set
-		public static function instantiateRow(rowObj:Object, ctor:Class):Entity {
+		// returns an Entity instance using the factory with the fields in rowObj set
+		public static function instantiateRow(rowObj:Object, factory:ClassFactory):Entity {
 			if (USE_SINGLETONS_ONLY) {
 				// get singleton for this instance
-				return getSingleton(rowObj, ctor);
+				return getSingleton(rowObj, factory);
 			} else {
 				// NON-singleton behavior (for individual entities, still singleton lists for .all)
-				var entityInstance:Object = new ctor;
+				var entityInstance:Object = factory.newInstance();
 				entityInstance.setFields(rowObj);
 				return entityInstance as Entity;
 			}

@@ -13,6 +13,11 @@ package biz.int80
 		}
 		
 		override public function send(parameters:Object=null):AsyncToken {
+			if (! AppControllerBase.appController) {
+				trace("You must instantiate an appController to use RESTService!");
+				return null;
+			}
+			
 			// add apibase to url if it isn't there already
 			var apiBase:String = AppControllerBase.appController.getApiUrl();
 			if (this.url.indexOf(apiBase) == -1) {
