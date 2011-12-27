@@ -15,6 +15,7 @@
     <classEntry path="biz.int80.PandaCloseButton"/>
     <classEntry path="biz.int80.PersistantDataGrid"/>
     <classEntry path="biz.int80.IPersistantStorage"/>
+    <classEntry path="biz.int80.MutableDateField"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
