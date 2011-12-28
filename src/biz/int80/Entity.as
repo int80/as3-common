@@ -20,7 +20,7 @@ package biz.int80
 		
 		// the actual singletons by class / pk
 		protected static var _singletons:Object = {};
-		
+				
 		// should all entities created be singletons?
 		// this does not affect singleton ArrayCollections accessed with all()
 		public static var USE_SINGLETONS_ONLY:Boolean = true;
@@ -31,6 +31,8 @@ package biz.int80
 		public function Entity(fields:Object=null) {
 			this.setFields(fields);
 		}
+		
+		protected var fieldList:Array = [];
 		
 		// use this instead of auto-generated _classIdentifier
 		// "shadow" this in your subclass if you wish to use a different name
@@ -56,7 +58,14 @@ package biz.int80
 		
 		// field setter for an Entity instance
 		public function setField(fieldName:String, value:Object, fireFieldsChangedEvent:Boolean=true):void {
+			// if we got an object, this may be a sub-entity child
 			if (value is ObjectProxy) {
+				if (! this.hasOwnProperty(fieldName)) {
+					trace("ERROR: sub-property " + fieldName + " does not exist on " +
+						getQualifiedClassName(this) + " --- " + Object(this).type_name);
+					return;
+				}
+				
 				// get class and type info for this field
 				var type:String = getQualifiedClassName(this[fieldName]);
 				var typeInfo:Object = describeType(this);
@@ -76,7 +85,6 @@ package biz.int80
 				}
 				
 				var typeClass:Class = getDefinitionByName(typeName) as Class;
-				
 				this[fieldName] = new typeClass(value);
 			} else {
 				if (this.hasOwnProperty(fieldName)) {
@@ -89,17 +97,50 @@ package biz.int80
 						+ getQualifiedClassName(this));
 				}
 			}
+			
+			// keep track of what fields we have set
+			if (fieldList.indexOf(fieldName) == -1)
+				fieldList.push(fieldName);
 		
 			if (fireFieldsChangedEvent)
 				this.fieldsChanged();
 		}
 		
 		// populate properties of an instance
+		// best: pass in ObjectProxy
+		// ok: pass in Object
+		// shady: pass in Entity
 		public function setFields(fields:Object):void {
-			if (! fields) fields = {};
-
-			for (var field:* in fields) {
-				this.setField(field, fields[field], false);
+			if (! fields)
+				return;
+			
+			var fieldName:String;
+			
+			if (! (fields as Entity)) {
+				// this makes things easy. assume Object or ObjectProxy
+				for (fieldName in fields) {
+					this.setField(fieldName, fields[fieldName], false);
+				}
+			} else {
+				// not so easy, we have an instance. we need to find out what fields are on this instance.
+				// hope to god that we saved the list of fields which are set on this instance:
+				if (fieldList && fieldList.length) {
+					for each (fieldName in fieldList) {
+						this.setField(fieldName, fields[fieldName], false);
+					}
+				} else {
+					// we are probably boned. this is unlikely to work.
+					trace("Failed to find field list on " + getQualifiedClassName(this) + 
+						". Please don't pass an Entity to Entity.setFields or the Entity constructor");
+				
+					var def:XML = describeType(fields);
+					var properties:XMLList = def..variable.@name + def..accessor.@name;				
+					for(var i:int; i < properties.length(); i++){
+						trace(properties[i].@name+':'+ this[properties[i].@name]);
+						fieldName = properties[i].@name;
+						this.setField(fieldName, fields[fieldName], false);
+					}
+				}
 			}
 			
 			this.fieldsChanged();
@@ -147,6 +188,18 @@ package biz.int80
 			}
 			
 			return _entities[className];
+		}
+		
+		// probably shouldn't be used
+		static public function setEntities(entityClass:Class, list:ArrayCollection):void {			
+			var className:String = _classIdentifier(entityClass);
+			
+			if (_entities[className]) {
+				ArrayCollection(_entities[className]).removeAll();
+				ArrayCollection(_entities[className]).addAll(list);
+			} else {
+				_entities[className] = list;
+			}
 		}
 		
 		// reloads a single entity's fields
