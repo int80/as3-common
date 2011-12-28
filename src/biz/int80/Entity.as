@@ -59,7 +59,8 @@ package biz.int80
 		// field setter for an Entity instance
 		public function setField(fieldName:String, value:Object, fireFieldsChangedEvent:Boolean=true):void {
 			// if we got an object, this may be a sub-entity child
-			if (value is ObjectProxy) {
+			//trace("value: " + (typeof(value)) + " is object: " + (value is Object) + " prototype is Object: " + (value.hasOwnProperty("prototype") && value.prototype == Object));
+			if (typeof(value) == 'object') {
 				if (! this.hasOwnProperty(fieldName)) {
 					trace("ERROR: sub-property " + fieldName + " does not exist on " +
 						getQualifiedClassName(this) + " --- " + Object(this).type_name);
@@ -271,6 +272,12 @@ package biz.int80
 		}
 		
 		protected function loadComplete(res:ResultEvent):void {
+			if (typeof(res.result) == 'string') {
+				// error
+				trace("Failed to load " + getQualifiedClassName(this) + ": " + res.result + ": " + res);
+				return;
+			}
+			
 			this.setFields(res.result.opt.data.list);
 			this.dispatchEvent(new Event("EntityLoaded"))
 		}
