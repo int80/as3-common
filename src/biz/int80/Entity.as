@@ -32,7 +32,10 @@ package biz.int80
 			this.setFields(fields);
 		}
 		
-		protected var fieldList:Array = [];
+		// events
+		public static const FIELDS_CHANGED_EVENT:String = "FieldsChanged";
+		public static const ENTITY_LOADED_EVENT:String  = "EntityLoaded";
+		public static const ENTITY_UPDATED_EVENT:String = "EntityUpdated";
 		
 		// use this instead of auto-generated _classIdentifier
 		// "shadow" this in your subclass if you wish to use a different name
@@ -47,7 +50,10 @@ package biz.int80
 		}
 		
 		//// fields
-		
+
+		// list of fields that have been set on our instance
+		protected var fieldList:Array = [];
+
 		// returns value of a field
 		[Bindable(event="FieldsChanged")] public function field(fieldName:String):* {
 			if (! this.hasOwnProperty(fieldName))
@@ -268,7 +274,7 @@ package biz.int80
 		//// events
 		
 		protected function fieldsChanged():void {
-			this.dispatchEvent(new Event("FieldsChanged"));
+			this.dispatchEvent(new Event(FIELDS_CHANGED_EVENT));
 		}
 		
 		protected function loadComplete(res:ResultEvent):void {
@@ -279,7 +285,7 @@ package biz.int80
 			}
 			
 			this.setFields(res.result.opt.data.list);
-			this.dispatchEvent(new Event("EntityLoaded"))
+			this.dispatchEvent(new Event(ENTITY_LOADED_EVENT));
 		}
 		
 		// for compatibility
@@ -319,13 +325,12 @@ package biz.int80
 			else
 				entityList.removeAll();
 				
-			//this.dispatchEvent(new Event("EntitiesUpdated"));
-			entityList.dispatchEvent(new Event("EntitiesLoaded"));
+			entityList.dispatchEvent(new EntitiesLoadedEvent(entityClassFactory.generator));
 		}
 		
 		protected function updateComplete(evt:ResultEvent):void {
 			this.load();
-			this.dispatchEvent(new Event("EntityUpdated"));
+			this.dispatchEvent(new Event(ENTITY_UPDATED_EVENT));
 		}
 		
 		
