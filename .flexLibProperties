@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="false" useMultiPlatformConfig="false" version="1">
   <includeClasses>
-    <classEntry path="biz.int80.Window"/>
     <classEntry path="biz.int80.AppControllerBase"/>
-    <classEntry path="biz.int80.RESTService"/>
-    <classEntry path="biz.int80.VideoPlayer"/>
-    <classEntry path="biz.int80.WindowManager"/>
+    <classEntry path="biz.int80.ConfirmDialog"/>
     <classEntry path="biz.int80.EntitiesLoadedEvent"/>
     <classEntry path="biz.int80.Entity"/>
-    <classEntry path="biz.int80.ConfirmDialog"/>
-    <classEntry path="biz.int80.ResizableWindow"/>
-    <classEntry path="biz.int80.ResizableWindowSkin"/>
+    <classEntry path="biz.int80.IAppController"/>
+    <classEntry path="biz.int80.IPersistantStorage"/>
+    <classEntry path="biz.int80.MutableDateField"/>
     <classEntry path="biz.int80.PandaButton"/>
     <classEntry path="biz.int80.PandaCloseButton"/>
     <classEntry path="biz.int80.PersistantDataGrid"/>
-    <classEntry path="biz.int80.IPersistantStorage"/>
-    <classEntry path="biz.int80.MutableDateField"/>
+    <classEntry path="biz.int80.RESTService"/>
+    <classEntry path="biz.int80.ResizableWindow"/>
+    <classEntry path="biz.int80.ResizableWindowSkin"/>
+    <classEntry path="biz.int80.VideoPlayer"/>
+    <classEntry path="biz.int80.Window"/>
+    <classEntry path="biz.int80.WindowManager"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

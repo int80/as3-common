@@ -38,7 +38,7 @@
 				var savedWidths:Array = so.data.columnWidths;
 				if (! savedWidths) return;
 				
-				if (savedWidths.length > cols.length) return;
+				if (savedWidths.length != cols.length) return;
 				
 				loadingWidths = true;
 				
