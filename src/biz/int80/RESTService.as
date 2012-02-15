@@ -29,12 +29,16 @@ package biz.int80
 			if (! parameters)
 				parameters = {};
 			
-			if (this.method && this.method.toUpperCase() != "GET") {
-				parameters["x-tunneled-method"] = this.method;
-				this.method = "POST"; // must be POST for Catalyst::Request::REST::ForBrowsers
-			} else {
-				this.method = "GET";
+			// tunnel method if it's not a GET
+			if (! parameters["x-tunneled-method"]) {
+				if (this.method && this.method.toUpperCase() != "GET") {
+					parameters["x-tunneled-method"] = this.method;
+					this.method = "POST"; // must be POST for Catalyst::Request::REST::ForBrowsers
+				} else {
+					this.method = "GET";
+				}
 			}
+
 			return super.send(parameters);
 		}
 	}

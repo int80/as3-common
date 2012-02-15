@@ -13,6 +13,10 @@
 	
 	<fx:Script>
 		<![CDATA[
+			import mx.collections.ArrayCollection;
+			import mx.collections.ISort;
+			import mx.collections.Sort;
+			import mx.collections.SortField;
 			import mx.controls.dataGridClasses.DataGridColumn;
 			import mx.core.ScrollPolicy;
 			import mx.events.DataGridEvent;
@@ -20,13 +24,22 @@
 			
 			private var loadingWidths:Boolean = false;
 			private var canSaveWidths:Boolean = false;
+			private var canSaveSort:Boolean   = false;
+			
+			private var _loadedSort:ISort;
 			
 			private function setup():void {
 				loadSavedColumnWidths();
+				loadSavedSorts();
 				this.addEventListener(IndexChangedEvent.HEADER_SHIFT, saveColumnWidths);
 				this.addEventListener(DataGridEvent.COLUMN_STRETCH, saveColumnWidths);
 				
-				this.addEventListener(FocusEvent.FOCUS_IN, function (evt:Event):void { canSaveWidths = true });
+				// there isn't really any good event that we can hook into for detecting when sort has finished changing
+				setInterval(saveSorts, 1000 * 60 * 3);
+				
+				this.addEventListener(FocusEvent.FOCUS_IN, function (evt:Event):void {
+					canSaveWidths = canSaveSort = true
+				});
 				//this.addEventListener(FocusEvent.FOCUS_OUT, function (evt:Event):void { trace("focus out") });
 			}
 			
@@ -60,6 +73,81 @@
 				loadingWidths = false;
 			}
 			
+			public function saveSorts(evt:Event=null):void {
+				if (! canSaveSort) return;
+				
+				var dp:ArrayCollection = this.dataProvider as ArrayCollection;
+				if (! dp) return;
+				
+				var so:SharedObject = this.sharedObject;
+				if (! so) return;
+				
+				var sort:mx.collections.Sort = dp.sort as mx.collections.Sort;
+				if (! sort) return;
+				
+				var sortFieldList:Array = [];
+				for each (var sortField:SortField in sort.fields) {
+					// serialize SortField
+					sortFieldList.push({
+						fieldName: sortField.name,
+						caseInsensitive: sortField.caseInsensitive,
+						numeric: sortField.numeric,
+						descending: sortField.descending
+					});
+				}
+				
+				if (sortFieldList)
+					so.data.sortFieldList = sortFieldList;
+				else
+					so.data.sortFieldList = null;
+				
+				so.flush();
+			}
+			
+			override public function set dataProvider(value:Object):void {
+				super.dataProvider = value;
+				
+				// use the saved sorting info as the default sort
+				if (value && ! value.sort && _loadedSort) {
+					value.sort = _loadedSort;
+				}
+			}
+			
+			public function loadSavedSorts(evt:Event=null):void {
+				var dp:ArrayCollection = this.dataProvider as ArrayCollection;
+				if (! dp) return;
+				
+				var so:SharedObject = this.sharedObject;
+				if (! so) return;
+				
+				var sort:Sort = dp.sort as Sort;
+				if (! sort) {
+					sort = new Sort();
+				}
+
+				var sortFieldList:Array = so.data.sortFieldList;
+				if (! sortFieldList) {
+					dp.sort = null;
+					return;
+				}
+				
+				// go through each saved sorting column, deserialize relevant information 
+				// (not sure if this breaks custom date sort functions)
+				var sortFields:Array = [];
+				for each (var sortInfo:Object in sortFieldList) {
+					var name:String = sortInfo.fieldName;
+					var descending:Boolean = sortInfo.descending;
+					var caseInsensitive:Boolean = sortInfo.caseInsensitive;
+					var numeric:Boolean = sortInfo.numeric;
+					var field:SortField = new SortField(name, caseInsensitive, descending, numeric);
+					sortFields.push(field);
+				}
+				
+				sort.fields = sortFields;
+				_loadedSort = dp.sort = sort;
+				dp.refresh();
+			}
+			
 			public function saveColumnWidths(evt:Event=null):void {
 				if (loadingWidths) return;
 				
@@ -78,6 +166,7 @@
 				}
 			
 				so.data.columnWidths = savedWidths;
+				
 				so.flush();
 			}
 			
