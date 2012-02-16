@@ -1,5 +1,6 @@
 package biz.int80
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.net.URLVariables;
 	import flash.system.Capabilities;
@@ -25,6 +26,15 @@ package biz.int80
 		}
 		
 		public function getApiUrl(path:String="", args:URLVariables=null):String {
+			var url:String = urlRoot + "/api/" + path;
+			
+			if (! args || ! args.toString())
+				return url;
+				
+			return url + "?" + args.toString(); 
+		}
+		
+		public function get urlRoot():String {
 			var urlRoot:String = FlexGlobals.topLevelApplication.parameters.base_url;
 			
 			if (! urlRoot) {
@@ -32,14 +42,9 @@ package biz.int80
 				if (! urlRoot)
 					urlRoot = "http://localhost:3000";
 			}
-			
-			var url:String = urlRoot + "/api/" + path;
-			
-			if (! args || ! args.toString())
-				return url;
-				
-			return url + "?" + args.toString(); 
-		} 
+
+			return urlRoot;
+		}
 		
 		public function getEntitySingleton(entityClass:Class):Entity {
 			var entFactory:ClassFactory = new ClassFactory(entityClass);

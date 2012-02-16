@@ -12,5 +12,6 @@ package biz.int80
 		function defaultApiUrl():String;
 		function getAllEntitiesFiltered(entityClass:Class, filterField:String, filterValue:Object=null):ArrayCollection;
 		function getAllEntities(entityClass:Class):ArrayCollection;
+		function get urlRoot():String;
 	}
 }

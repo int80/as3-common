@@ -24,7 +24,6 @@
 			
 			private var loadingWidths:Boolean = false;
 			private var canSaveWidths:Boolean = false;
-			private var canSaveSort:Boolean   = false;
 			
 			private var _loadedSort:ISort;
 			
@@ -33,12 +32,16 @@
 				loadSavedSorts();
 				this.addEventListener(IndexChangedEvent.HEADER_SHIFT, saveColumnWidths);
 				this.addEventListener(DataGridEvent.COLUMN_STRETCH, saveColumnWidths);
+				this.addEventListener(DataGridEvent.HEADER_RELEASE, function (e:Event=null):void {
+					// have to delay saving until it's taken care of business
+					setTimeout(saveSorts, 1000);
+				});
 				
 				// there isn't really any good event that we can hook into for detecting when sort has finished changing
 				setInterval(saveSorts, 1000 * 60 * 3);
 				
 				this.addEventListener(FocusEvent.FOCUS_IN, function (evt:Event):void {
-					canSaveWidths = canSaveSort = true
+					canSaveWidths = true
 				});
 				//this.addEventListener(FocusEvent.FOCUS_OUT, function (evt:Event):void { trace("focus out") });
 			}
@@ -74,8 +77,6 @@
 			}
 			
 			public function saveSorts(evt:Event=null):void {
-				if (! canSaveSort) return;
-				
 				var dp:ArrayCollection = this.dataProvider as ArrayCollection;
 				if (! dp) return;
 				
