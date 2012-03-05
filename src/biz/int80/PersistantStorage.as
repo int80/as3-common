@@ -1,10 +1,12 @@
 import flash.net.SharedObject;
 import flash.utils.describeType;
 
+private var _storageVersion:String = "";
+
 public function get sharedObject():SharedObject {
 	var className:String = this.sharedObjectKey;
 	if (! className) return null;
-	
+		
 	var savedState:SharedObject;
 	try {
 		savedState = SharedObject.getLocal(className);
@@ -28,5 +30,5 @@ public function get sharedObjectKey():String {
 	className = className.replace('.', '_');
 	className = className.replace('::', '_');
 	
-	return this.sharedObjectPrefix + className;
+	return this.sharedObjectPrefix + className + _storageVersion;
 }

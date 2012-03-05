@@ -200,13 +200,7 @@ package biz.int80
 		// probably shouldn't be used
 		static public function setEntities(entityClass:Class, list:ArrayCollection):void {			
 			var className:String = _classIdentifier(entityClass);
-			
-			if (_entities[className]) {
-				ArrayCollection(_entities[className]).removeAll();
-				ArrayCollection(_entities[className]).addAll(list);
-			} else {
-				_entities[className] = list;
-			}
+			_entities[className] = list;
 		}
 		
 		// reloads a single entity's fields
