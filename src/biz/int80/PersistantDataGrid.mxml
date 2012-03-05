@@ -59,6 +59,7 @@
 				loadingWidths = true;
 				
 				// read column widths
+				var origScrollPolicy:String = this.horizontalScrollPolicy;
 				this.horizontalScrollPolicy = ScrollPolicy.ON;
 				
 				for (var i:int = 0; i < savedWidths.length; i++) {
@@ -71,7 +72,7 @@
 					}
 				}
 				
-				this.horizontalScrollPolicy = ScrollPolicy.OFF;
+				this.horizontalScrollPolicy = origScrollPolicy;
 
 				loadingWidths = false;
 			}
