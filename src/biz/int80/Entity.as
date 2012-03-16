@@ -69,7 +69,7 @@ package biz.int80
 			if (typeof(value) == 'object') {
 				if (! this.hasOwnProperty(fieldName)) {
 					trace("ERROR: sub-property " + fieldName + " does not exist on " +
-						getQualifiedClassName(this) + " --- " + Object(this).type_name);
+						getQualifiedClassName(this) + " --- " + (this.hasOwnProperty('type_name') ? Object(this).type_name : this.toString()));
 					return;
 				}
 				
@@ -204,9 +204,15 @@ package biz.int80
 		}
 		
 		// reloads a single entity's fields
-		public function load(cb:Function=null):void {			
+		public function load(cb:Function=null, params:Object=null):void {			
 			var self:Entity = this;
 						
+			// comnbine primaryKey and params
+			var p:Object = primaryKey();
+			for (var k:String in params) {
+				p[k] = params[k];
+			}
+			
 			doRequest(
 				"", 
 				function (evt:ResultEvent):void {
@@ -215,7 +221,7 @@ package biz.int80
 						cb.apply(self);
 				},
 				"GET",
-				self.primaryKey()
+				p
 			);
 		}
 		

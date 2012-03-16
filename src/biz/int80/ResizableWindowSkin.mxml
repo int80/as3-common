@@ -229,7 +229,7 @@ in accordance with the terms of the license agreement accompanying it.
 				<s:Group id="moveArea" left="0" right="0" top="0" bottom="0" />
 				
 				<!--- @copy spark.components.TitleWindow#closeButton -->
-				<s:Button id="closeButton" skinClass="biz.int80.PandaCloseButton"
+				<s:Button id="closeButton" skinClass="biz.int80.CloseButton"
 						  width="20" height="20" right="7" top="7"/>
 			</s:Group>
 			

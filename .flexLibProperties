@@ -8,8 +8,8 @@
     <classEntry path="biz.int80.IAppController"/>
     <classEntry path="biz.int80.IPersistantStorage"/>
     <classEntry path="biz.int80.MutableDateField"/>
-    <classEntry path="biz.int80.PandaButton"/>
-    <classEntry path="biz.int80.PandaCloseButton"/>
+    <classEntry path="biz.int80.WhiteButton"/>
+    <classEntry path="biz.int80.CloseButton"/>
     <classEntry path="biz.int80.PersistantDataGrid"/>
     <classEntry path="biz.int80.RESTService"/>
     <classEntry path="biz.int80.ResizableWindow"/>
