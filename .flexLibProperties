@@ -14,7 +14,6 @@
     <classEntry path="biz.int80.RESTService"/>
     <classEntry path="biz.int80.ResizableWindow"/>
     <classEntry path="biz.int80.ResizableWindowSkin"/>
-    <classEntry path="biz.int80.VideoPlayer"/>
     <classEntry path="biz.int80.Window"/>
     <classEntry path="biz.int80.WindowManager"/>
   </includeClasses>
