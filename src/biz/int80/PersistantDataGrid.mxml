@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" 
+<s:DataGrid xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			 xmlns:s="library://ns.adobe.com/flex/spark" 
 			 xmlns:mx="library://ns.adobe.com/flex/mx"
 			 creationComplete="setup()"
@@ -14,13 +14,21 @@
 	<fx:Script>
 		<![CDATA[
 			import mx.collections.ArrayCollection;
+			import mx.collections.ArrayList;
+			import mx.collections.IList;
 			import mx.collections.ISort;
-			import mx.collections.Sort;
-			import mx.collections.SortField;
+			import mx.collections.errors.SortError;
 			import mx.controls.dataGridClasses.DataGridColumn;
 			import mx.core.ScrollPolicy;
+			import mx.events.CollectionEvent;
 			import mx.events.DataGridEvent;
 			import mx.events.IndexChangedEvent;
+			
+			import spark.collections.Sort;
+			import spark.collections.SortField;
+			import spark.components.gridClasses.GridColumn;
+			import spark.events.GridEvent;
+			import spark.events.GridSortEvent;
 			
 			private var loadingWidths:Boolean = false;
 			private var canSaveWidths:Boolean = false;
@@ -30,71 +38,37 @@
 			private function setup():void {
 				loadSavedColumnWidths();
 				loadSavedSorts();
-				this.addEventListener(IndexChangedEvent.HEADER_SHIFT, saveColumnWidths);
-				this.addEventListener(DataGridEvent.COLUMN_STRETCH, saveColumnWidths);
-				this.addEventListener(DataGridEvent.HEADER_RELEASE, function (e:Event=null):void {
-					// have to delay saving until it's taken care of business
-					setTimeout(saveSorts, 1000);
-				});
-				
-				// there isn't really any good event that we can hook into for detecting when sort has finished changing
-				setInterval(saveSorts, 1000 * 60 * 3);
+				this.addEventListener(MouseEvent.MOUSE_OUT, saveColumnWidths);
+				this.addEventListener(GridSortEvent.SORT_CHANGE, saveSorts);
 				
 				this.addEventListener(FocusEvent.FOCUS_IN, function (evt:Event):void {
 					canSaveWidths = true
 				});
-				//this.addEventListener(FocusEvent.FOCUS_OUT, function (evt:Event):void { trace("focus out") });
 			}
 			
-			public function loadSavedColumnWidths():void {
-				var so:SharedObject = this.sharedObject;
-				if (! so) return;
-				
-				var cols:Array = this.columns;
-				var savedWidths:Array = so.data.columnWidths;
-				if (! savedWidths) return;
-				
-				if (savedWidths.length != cols.length) return;
-				
-				loadingWidths = true;
-				
-				// read column widths
-				var origScrollPolicy:String = this.horizontalScrollPolicy;
-				this.horizontalScrollPolicy = ScrollPolicy.ON;
-				
-				for (var i:int = 0; i < savedWidths.length; i++) {
-					var savedWidth:int = savedWidths[i];
-
-					if (savedWidth) {
-						// found saved column width
-						var col:DataGridColumn = cols[i];
-						if (col) col.width = savedWidth;
-					}
-				}
-				
-				this.horizontalScrollPolicy = origScrollPolicy;
-
-				loadingWidths = false;
-			}
-			
-			public function saveSorts(evt:Event=null):void {
+			public function saveSorts(evt:GridSortEvent):void {
 				var dp:ArrayCollection = this.dataProvider as ArrayCollection;
 				if (! dp) return;
 				
 				var so:SharedObject = this.sharedObject;
 				if (! so) return;
 				
-				var sort:mx.collections.Sort = dp.sort as mx.collections.Sort;
+				var sort:spark.collections.Sort = dp.sort as spark.collections.Sort;
 				if (! sort) return;
 				
-				var sortFieldList:Array = [];
-				for each (var sortField:SortField in sort.fields) {
-					// serialize SortField
+				var cols:ArrayList = ArrayList(this.columns);				
+				var sortFieldList:Vector.<Object> = new Vector.<Object>;
+				for (var i:int = 0; i < cols.length; i++) {
+					var col:GridColumn = cols.getItemAt(i) as GridColumn;
+					if (! col) {
+						trace("failed to get GridColumn for index " + i);
+						continue;
+					}
+					
+					// serialize GridCol sort
 					sortFieldList.push({
-						fieldName: sortField.name,
-						caseInsensitive: sortField.caseInsensitive,
-						numeric: sortField.numeric,
-						descending: sortField.descending
+						fieldName: col.dataField,
+						descending: col.sortDescending
 					});
 				}
 				
@@ -103,51 +77,69 @@
 				else
 					so.data.sortFieldList = null;
 				
+				so.data.sortIndices = evt.columnIndices;
+								
 				so.flush();
 			}
 			
-			override public function set dataProvider(value:Object):void {
+			protected var settingSort:Boolean = false;
+			override public function set dataProvider(value:IList):void {
 				super.dataProvider = value;
-				
-				// use the saved sorting info as the default sort
-				if (value && ! value.sort && _loadedSort) {
-					value.sort = _loadedSort;
+
+				var ac:ArrayCollection = value as ArrayCollection;
+				if (! ac) {
+					return;
 				}
 			}
 			
 			public function loadSavedSorts(evt:Event=null):void {
 				var dp:ArrayCollection = this.dataProvider as ArrayCollection;
-				if (! dp) return;
 				
 				var so:SharedObject = this.sharedObject;
 				if (! so) return;
 				
-				var sort:Sort = dp.sort as Sort;
-				if (! sort) {
-					sort = new Sort();
-				}
-
-				var sortFieldList:Array = so.data.sortFieldList;
-				if (! sortFieldList) {
-					dp.sort = null;
+				var sortFieldList:Vector.<Object> = so.data.sortFieldList as Vector.<Object>;
+				if (! sortFieldList)
 					return;
+				
+				var sortIndices:Vector.<int> = so.data.sortIndices;
+				
+				var sortFields:Array = [];
+
+				if (sortIndices && sortIndices.length) {
+					this.sortByColumns(sortIndices, false);
+					if (columnHeaderGroup)
+						columnHeaderGroup.visibleSortIndicatorIndices = sortIndices;            
 				}
 				
-				// go through each saved sorting column, deserialize relevant information 
-				// (not sure if this breaks custom date sort functions)
-				var sortFields:Array = [];
-				for each (var sortInfo:Object in sortFieldList) {
+				for (var i:int = 0; i < sortIndices.length; i++) {
+					var sortIndex:int = sortIndices[i];
+					var sortInfo:Object = sortFieldList[sortIndex];
+					var col:GridColumn = columns.getItemAt(sortIndex) as GridColumn;
+					if (! col) {
+						trace("Failed to find GridColumn at index " + i);
+						continue;
+					}
+					
+					//trace("descending[" + i + "]: " + sortInfo.descending);
+					col.sortDescending = sortInfo.descending;
+					
 					var name:String = sortInfo.fieldName;
 					var descending:Boolean = sortInfo.descending;
-					var caseInsensitive:Boolean = sortInfo.caseInsensitive;
-					var numeric:Boolean = sortInfo.numeric;
-					var field:SortField = new SortField(name, caseInsensitive, descending, numeric);
+					var field:SortField = new SortField(name, descending);
 					sortFields.push(field);
 				}
+								
+				// find existing Sort
+				var sort:Sort;
+				if (dp)
+					sort = dp.sort as Sort;
+				if (! sort)
+					sort = new Sort();
 				
 				sort.fields = sortFields;
-				_loadedSort = dp.sort = sort;
-				dp.refresh();
+				
+				_loadedSort = sort;
 			}
 			
 			public function saveColumnWidths(evt:Event=null):void {
@@ -156,11 +148,11 @@
 				var so:SharedObject = this.sharedObject;
 				if (! so) return;
 				
-				var cols:Array = this.columns;
+				var cols:ArrayList = ArrayList(this.columns);
 				var savedWidths:Array = new Array();
 				
 				for (var i:int = 0; i < cols.length; i++) {
-					var col:DataGridColumn = cols[i];
+					var col:GridColumn = GridColumn(cols.getItemAt(i));
 					var width:int = col.width;
 
 					if (! width) continue;
@@ -170,13 +162,48 @@
 				so.data.columnWidths = savedWidths;
 				
 				so.flush();
+				
+				//dumpCols();
+			}
+			
+			public function loadSavedColumnWidths():void {
+				var so:SharedObject = this.sharedObject;
+				if (! so) return;
+				
+				var cols:ArrayList = ArrayList(this.columns);
+				var savedWidths:Array = so.data.columnWidths;
+				if (! savedWidths) return;
+				
+				if (savedWidths.length != cols.length) return;
+				
+				loadingWidths = true;
+				
+				// read column widths
+				//var origScrollPolicy:String = this.horizontalScrollPolicy;
+				//this.horizontalScrollPolicy = ScrollPolicy.ON;
+				
+				for (var i:int = 0; i < savedWidths.length; i++) {
+					var savedWidth:int = savedWidths[i];
+					
+					if (savedWidth) {
+						// found saved column width
+						var col:GridColumn = GridColumn(cols.getItemAt(i));
+						if (col) col.width = savedWidth;
+					}
+				}
+				
+				//this.horizontalScrollPolicy = origScrollPolicy;
+				
+				loadingWidths = false;
+				
+				//dumpCols();
 			}
 			
 			private function dumpCols():void {
-				var cols:Array = this.columns;
+				var cols:ArrayList = ArrayList(this.columns);
 				
 				for (var i:int = 0; i < cols.length; i++) {
-					var col:DataGridColumn = cols[i];
+					var col:GridColumn = GridColumn(cols.getItemAt(i));
 					var width:int = col.width;
 					trace("col " + i + " width: " + width);
 				}
@@ -189,4 +216,4 @@
 			}
 		]]>
 	</fx:Script>
-</mx:DataGrid>
+</s:DataGrid>
