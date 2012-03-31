@@ -7,9 +7,9 @@ package biz.int80
 
 	public class RESTService extends HTTPService
 	{		
-		public function RESTService(rootURL:String=null, destination:String=null)
+		public function RESTService()
 		{
-			super(rootURL, destination);
+			super();
 		}
 		
 		override public function send(parameters:Object=null):AsyncToken {

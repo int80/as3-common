@@ -98,6 +98,9 @@
 				var so:SharedObject = this.sharedObject;
 				if (! so) return;
 				
+				//if (so.data.sortFieldCount != this.columns.length)
+				//	return;
+								
 				var sortFieldList:Vector.<Object> = so.data.sortFieldList as Vector.<Object>;
 				if (! sortFieldList)
 					return;
@@ -182,13 +185,14 @@
 				//var origScrollPolicy:String = this.horizontalScrollPolicy;
 				//this.horizontalScrollPolicy = ScrollPolicy.ON;
 				
-				for (var i:int = 0; i < savedWidths.length; i++) {
+				for (var i:int = 0; i < savedWidths.length - 1; i++) {
 					var savedWidth:int = savedWidths[i];
 					
 					if (savedWidth) {
 						// found saved column width
 						var col:GridColumn = GridColumn(cols.getItemAt(i));
 						if (col) col.width = savedWidth;
+						//trace("saved width: " + savedWidth);
 					}
 				}
 				
