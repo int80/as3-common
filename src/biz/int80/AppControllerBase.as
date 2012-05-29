@@ -1,14 +1,17 @@
 package biz.int80
 {
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.net.URLVariables;
 	import flash.system.Capabilities;
 	
 	import mx.collections.ArrayCollection;
+	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.core.ClassFactory;
 	import mx.core.FlexGlobals;
+	import mx.core.IFlexModuleFactory;
 	
 	[Bindable] public class AppControllerBase extends EventDispatcher implements IAppController
 	{
@@ -23,6 +26,17 @@ package biz.int80
 		
 		public function AppControllerBase()
 		{
+		}
+				
+		// override this for AIR apps, since AIR doesn't have DBAppController.appController.showAlert()
+		public function showAlert(text:String = "", title:String = "",
+										   flags:uint = 0x4 /* Alert.OK */, 
+										   parent:Sprite = null, 
+										   closeHandler:Function = null, 
+										   iconClass:Class = null, 
+										   defaultButtonFlag:uint = 0x4 /* Alert.OK */,
+										   moduleFactory:IFlexModuleFactory = null):void {
+			Alert.show(text, title, flags, parent, closeHandler, iconClass, defaultButtonFlag, moduleFactory);
 		}
 		
 		public function getApiUrl(path:String="", args:URLVariables=null):String {

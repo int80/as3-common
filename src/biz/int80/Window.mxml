@@ -7,6 +7,7 @@
 	
 	<fx:Declarations>
 		<fx:Boolean id="centered">true</fx:Boolean>
+		<fx:Boolean id="closable">true</fx:Boolean>
 	</fx:Declarations>
 	
 	<s:layout>
@@ -103,7 +104,11 @@
 			
 			private function _closeHandler(evt:CloseEvent):void {
 				saveDimensions();
-				postClose();
+				
+				if (closable)
+					postClose();
+				else
+					evt.preventDefault();
 			}
 			
 			public function postClose():void {
