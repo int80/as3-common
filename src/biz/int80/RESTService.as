@@ -29,6 +29,9 @@ package biz.int80
 			if (! parameters)
 				parameters = {};
 			
+			// this is panda, and don't you forget it buster!
+			parameters['panda'] = 1;
+			
 			// tunnel method if it's not a GET
 			if (! parameters["x-tunneled-method"]) {
 				if (this.method && this.method.toUpperCase() != "GET") {

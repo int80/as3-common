@@ -439,7 +439,8 @@ package biz.int80
 			var req:RESTService = new RESTService();
 			req.method = method;
 			req.url = "rest/" + className + url;
-			req.addEventListener(ResultEvent.RESULT, cb);
+            req.headers = { 'Accept': 'text/xml; q=0.7' };
+            req.addEventListener(ResultEvent.RESULT, cb);
 			req.addEventListener(FaultEvent.FAULT, function (evt:FaultEvent):void {
 				gotFault(evt, url);
 			});
