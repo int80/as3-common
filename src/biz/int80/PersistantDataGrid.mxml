@@ -218,6 +218,11 @@
 				if (this.id) key += this.id + "_";
 				return key;
 			}
+
+			public function refresh():void{
+				this.setup();
+			}
+
 		]]>
 	</fx:Script>
 </s:DataGrid>
